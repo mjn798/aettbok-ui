@@ -23,6 +23,11 @@
                             </v-radio-group>
                         </v-col>
                     </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
+                        <v-col cols="12"><person-linker :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" label="Parents" /></v-col>
+                        <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" /></v-col>
+                    </v-row>
                 </v-container>
             </v-card-text>
             <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
@@ -31,9 +36,12 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
+import DocumentLinker from '../documents/DocumentLinker.vue'
+import PersonLinker from './PersonLinker.vue'
 
 export default {
 
@@ -41,6 +49,8 @@ export default {
 
     components: {
         'card-actions': CardActions,
+        'document-linker': DocumentLinker,
+        'person-linker': PersonLinker,
     },
 
     props: {
@@ -71,14 +81,56 @@ export default {
 
   methods: {
 
-      ...mapActions({
-          delete: 'deletePerson',
-          upsert: 'upsertPerson',
-      }),
+    close()  { return this.$emit('close') },
 
-      close()  { return this.$emit('close') },
-      remove() { return this.delete(this.item.id).then(this.close()) },
-      save()   { return this.upsert(this.item).then(this.close()) },
+    remove() {
+
+        // call REST API
+
+        return aettbok.deleteNodeWithLabelAndId('Person', this.item.id)
+        .catch(error => console.error(error))
+        .finally(() => this.close())
+
+    },
+
+    save() {
+
+        // convert empty strings to null values
+
+        if (!this.item.alive)     { this.item.alive = false }
+
+        if (!this.item.firstname) { this.item.firstname = null }
+        if (!this.item.lastname)  { this.item.lastname = null }
+        if (!this.item.gender)    { this.item.gender = 'u' }
+        if (!this.item.notes)     { this.item.notes = null }
+
+        // call REST API
+
+        return aettbok.upsertPerson(this.item)
+        .catch(error => console.error(error))
+        .finally(() => this.close())
+
+    },
+
+    linkedDocument(id) {
+        let index = this.item.documentedby.findIndex(e => e === id)
+        return index === -1 ? this.item.documentedby.push(id) : null
+    },
+
+    linkedParent(id) {
+        let index = this.item.hasparents.findIndex(e => e === id)
+        return index === -1 ? this.item.hasparents.push(id) : null
+    },
+
+    unlinkedDocument(id) {
+        let index = this.item.documentedby.findIndex(e => e === id)
+        return index === -1 ? null : this.item.documentedby.splice(index, 1)
+    },
+
+    unlinkedParent(id) {
+        let index = this.item.hasparents.findIndex(e => e === id)
+        return index === -1 ? null : this.item.hasparents.splice(index, 1)
+    },
 
   },
 
@@ -88,10 +140,14 @@ export default {
 
         if (id === undefined || id === null) { return this.item = {
             id: null,
-            firstname: null,
-            lastname: null,
-            gender: 'u',
             alive: false,
+            documentedby: [],
+            firstname: null,
+            gender: 'u',
+            hasparents: [],
+            lastname: null,
+            notes: null,
+            tags: [],
         }}
 
         return this.item = { ...this.getPerson(id) }

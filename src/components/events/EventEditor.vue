@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
@@ -78,11 +78,6 @@ export default {
     },
 
   methods: {
-
-    ...mapActions({
-        delete: 'deleteEvent',
-        upsert: 'upsertEvent',
-    }),
 
     close()  { return this.$emit('close') },
 

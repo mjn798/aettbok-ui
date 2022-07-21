@@ -3,11 +3,11 @@
         <v-autocomplete
             :filter="filterPersons"
             :items="getPersons"
+            :label="label"
             class="ma-2"
             dense
             hide-details
             item-value="id"
-            label="Related Persons"
             outlined
             v-model="selectedPerson"
         >
@@ -57,6 +57,7 @@ export default {
 
     props: {
         persons: { type: Array, default: () => [] },
+        label: { type: String, default: 'Related Persons' },
     },
 
     data: () => ({

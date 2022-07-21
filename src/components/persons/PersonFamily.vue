@@ -64,7 +64,7 @@ export default {
 
     selectedPerson() { return this.getPerson(this.$route.params.id) },
 
-    getParents() { return this.getPersons.filter(e => this.selectedPerson.parents.includes(e.id)).sort((a, b) => (b.gender || '').localeCompare(a.gender || '')) },
+    getParents() { return this.getPersons.filter(e => this.selectedPerson.hasparents.includes(e.id)).sort((a, b) => (b.gender || '').localeCompare(a.gender || '')) },
 
     getPartnersAndChildren() {
 
@@ -89,23 +89,19 @@ export default {
         // PARTNERS FROM CHILDREN'S PARENTS
         // could be a bastard child
 
-        this.selectedPerson.children.forEach(e => {
+        this.selectedPerson.haschildren.forEach(e => {
 
             let child = this.getPerson(e)
-            let partner = child.parents.filter(p => p !== this.selectedPerson.id)
+            let partner = child.hasparents.filter(p => p !== this.selectedPerson.id)
 
             if (!partner.length) {
                 let x = structure.find(s => s.partner.id === 'unknown')
-                if (!x) {
-                    return structure.push({ partner: { id: 'unknown'}, children: [child] })
-                }
-                return x.children.push(child)
+                return x ? x.children.push(child) : structure.push({ partner: { id: 'unknown'}, children: [child] })
             }
 
             return partner.forEach(p => {
                 let x = structure.find(s => s.partner.id === p)
-                if (!x) { return structure.push({ partner: this.getPerson(p), children: [child] }) }
-                return x.children.push(child)
+                return x ? x.children.push(child) : structure.push({ partner: this.getPerson(p), children: [child] })
             })
 
         })
@@ -121,29 +117,27 @@ export default {
         let siblingsFull = new Set()
         let siblingsHalf = new Set()
 
-        this.selectedPerson.parents.forEach(e => {
+        this.selectedPerson.hasparents.forEach(e => {
 
             let parent = this.getPerson(e)
 
-            if (parent.children) {
+            if (!parent.haschildren) { return }
 
-                parent.children.forEach(child => {
+            parent.haschildren.forEach(child => {
 
-                    let sibling = this.getPerson(child)
+                let sibling = this.getPerson(child)
 
-                    let isFull = true
-                    
-                    sibling.parents.forEach(e => {
-                        if (!this.selectedPerson.parents.includes(e)) { return isFull = false }
-                    })
-
-                    if (isFull) { return siblingsFull.add(this.getPerson(child)) }
-
-                    return siblingsHalf.add(this.getPerson(child))
-
+                let isFull = true
+                
+                sibling.hasparents.forEach(e => {
+                    if (!this.selectedPerson.hasparents.includes(e)) { return isFull = false }
                 })
 
-            }
+                if (isFull) { return siblingsFull.add(this.getPerson(child)) }
+
+                return siblingsHalf.add(this.getPerson(child))
+
+            })
 
         })
 

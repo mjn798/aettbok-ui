@@ -1,5 +1,6 @@
 <template>
     <v-container class="ma-0 pa-0">
+        <person-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <document-editor :id="viewingDocument" @close="viewDocument(undefined)" />
         <v-row no-gutters>
             <v-col cols="12">
@@ -46,6 +47,7 @@ import { mapGetters } from 'vuex'
 import { getFormattedDate } from '../../scripts/aettbok'
 
 import DocumentEditor from '../documents/DocumentEditor.vue'
+import PersonEditor from './PersonEditor.vue'
 import PersonEvents from './PersonEvents.vue'
 import PersonFamily from './PersonFamily.vue'
 import PersonIcon from './PersonIcon.vue'
@@ -57,6 +59,7 @@ export default {
 
   components: {
     'document-editor': DocumentEditor,
+    'person-editor': PersonEditor,
     'person-events': PersonEvents,
     'person-family': PersonFamily,
     'person-icon': PersonIcon,
@@ -65,6 +68,7 @@ export default {
 
   data: () => ({
 
+    editingItemId: undefined,
     viewingDocument: undefined,
 
   }),
@@ -123,7 +127,7 @@ export default {
 
   methods: {
 
-    upsertItem(id) { return null },
+    upsertItem(id) { return this.editingItemId = id },
     viewDocument(id) { return this.viewingDocument = id },
 
     getDocumentLabel(id) {

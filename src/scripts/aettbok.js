@@ -336,8 +336,8 @@ function processPersons() {
     persons.forEach(person => {
 
         person.marriages = 0
-        person.parents = []
-        person.children = []
+        person.hasparents = []
+        person.haschildren = []
 
         // icon
 
@@ -358,9 +358,13 @@ function processPersons() {
         person.numberOfDocuments = person.documentedby.length || 0
         person.numberOfDocumentsIcon = `mdi-numeric-${person.numberOfDocuments < 10 ? person.numberOfDocuments : '9-plus'}-box${person.numberOfDocuments === 0 ? '-outline' : '-multiple'}`
 
+        // tags
+
+        person.tags = person.relations.filter(relation => (relation.label === 'Tag') && (relation.direction === 'to')).map(e => e.id)
+
         // parents and children
 
-        person.relations.filter(e => (e.label === 'Person')).forEach(relation => relation.direction === 'to' ? person.parents.push(relation.id) : person.children.push(relation.id))
+        person.relations.filter(e => (e.label === 'Person')).forEach(relation => relation.direction === 'to' ? person.hasparents.push(relation.id) : person.haschildren.push(relation.id))
 
         // birth, death and marriage events
 
@@ -503,7 +507,7 @@ export function deleteNodeWithLabelAndId(label, id) {
 
 
 
-export function upsertEvent(event) {
+export function upsertEvent(item) {
     return new Promise((resolve, reject) => {
 
         const token = store.getters.getAuthenticationToken
@@ -511,12 +515,12 @@ export function upsertEvent(event) {
 
         let url = `${process.env.VUE_APP_API_BASE_URL}/Event`
 
-        if (event.id) { url += `/${event.id}` }
+        if (item.id) { url += `/${item.id}` }
 
-        console.warn(event)
+        console.warn(item)
 
         return axios
-        .post(url, event, { "headers": headers })
+        .post(url, item, { "headers": headers })
         .then(() => {
 
             refreshData()
@@ -528,7 +532,7 @@ export function upsertEvent(event) {
     })
 }
 
-export function upsertDocument(document) {
+export function upsertDocument(item) {
     return new Promise((resolve, reject) => {
 
         const token = store.getters.getAuthenticationToken
@@ -536,10 +540,32 @@ export function upsertDocument(document) {
 
         let url = `${process.env.VUE_APP_API_BASE_URL}/Document`
 
-        if (document.id) { url += `/${document.id}` }
+        if (item.id) { url += `/${item.id}` }
 
         return axios
-        .post(url, document, { "headers": headers })
+        .post(url, item, { "headers": headers })
+        .then(() => {
+
+            refreshData()
+            return resolve()
+
+        })
+        .catch(error => reject(error))
+
+    })
+}
+export function upsertPerson(item) {
+    return new Promise((resolve, reject) => {
+
+        const token = store.getters.getAuthenticationToken
+        const headers = { 'Authorization': `Bearer ${token}` }
+
+        let url = `${process.env.VUE_APP_API_BASE_URL}/Person`
+
+        if (item.id) { url += `/${item.id}` }
+
+        return axios
+        .post(url, item, { "headers": headers })
         .then(() => {
 
             refreshData()
@@ -551,7 +577,7 @@ export function upsertDocument(document) {
     })
 }
 
-export function upsertSource(source) {
+export function upsertSource(item) {
     return new Promise((resolve, reject) => {
 
         const token = store.getters.getAuthenticationToken
@@ -559,10 +585,10 @@ export function upsertSource(source) {
 
         let url = `${process.env.VUE_APP_API_BASE_URL}/Source`
 
-        if (source.id) { url += `/${source.id}` }
+        if (item.id) { url += `/${item.id}` }
 
         return axios
-        .post(url, source, { "headers": headers })
+        .post(url, item, { "headers": headers })
         .then(() => {
 
             refreshData()
