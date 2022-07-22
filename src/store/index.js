@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import * as aettbok from '../scripts/aettbok'
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -99,7 +97,7 @@ export default new Vuex.Store({
 
     getLocationType: (state) => (id) => state.locationtypes.find(e => e.id === id),
 
-    getLocationTypes: (state) => state.locationtypes,
+    getLocationTypes: (state) => state.locationtypes.sort((a, b) => (a.type || '').toUpperCase().localeCompare((b.type || '').toUpperCase())).sort((a, b) => (a.hierarchy || 0) - (b.hierarchy || 0)),
 
     /* PERSONS */
 

@@ -22,7 +22,7 @@
                                     dense
                                     hide-details
                                     item-text="type"
-                                    item-value="type"
+                                    item-value="id"
                                     label="Type"
                                     outlined
                                     v-model="filterType"
@@ -39,11 +39,7 @@
                                     prepend-inner-icon="mdi-magnify"
                                     v-model="filterHasName"
                                 >
-                                    <template v-slot:append-outer>
-                                        <div class="mt-n4">
-                                            <tooltip-button :icon="filterPartof ? 'mdi-map-marker-radius' : 'mdi-map-marker'" :tooltip="filterPartof ? 'Showing Locations and Parts' : 'Showing Locations only'" @click="filterPartof = !filterPartof" />
-                                        </div>
-                                    </template>
+                                    <template v-slot:append-outer><div class="mt-n4"><tooltip-button :icon="filterPartof ? 'mdi-map-marker-radius' : 'mdi-map-marker'" :tooltip="filterPartof ? 'Showing Locations and Parts' : 'Showing Locations only'" @click="filterPartof = !filterPartof" /></div></template>
                                 </v-text-field>
                             </v-col>
                         </v-row>
@@ -108,7 +104,7 @@ export default {
 
         getTableHeaders() { return [
             { value: 'numberOfDocuments', text: '', sortable: true, width: 45 },
-            { value: 'type', text: 'Type', sortable: true, align: 'end' },
+            { value: 'locationtypeString', text: 'Type', sortable: true, align: 'end' },
             { value: 'location', text: 'Location', sortable: true },
             { value: 'partofResolved', text: 'Part of', sortable: true },
             { value: 'actions', text: 'Actions', sortable: false, width: 110 },
@@ -119,7 +115,7 @@ export default {
             if (!this.filterState) { return this.getLocations }
 
             return this.getLocations
-                .filter(e => !(this.filterType && this.filterType !== e.type))
+                .filter(e => !(this.filterType && this.filterType !== e.locationtype))
                 .filter(e => {
                     if (!this.filterHasName) { return true }
                     if (this.filterPartof) { return (e.location && e.location.toLowerCase().includes(this.filterHasName.toLowerCase())) || (e.partofResolved && e.partofResolved.toLowerCase().includes(this.filterHasName.toLowerCase())) }

@@ -42,7 +42,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
 
@@ -85,16 +86,34 @@ export default {
 
   methods: {
 
-      ...mapActions({
-          delete: 'deleteTag',
-          upsert: 'upsertTag',
-      }),
+    close()  { return this.$emit('close') },
 
-      close()  { return this.$emit('close') },
-      remove() { return this.delete(this.item.id).then(this.close()) },
-      save()   { return this.upsert(this.item).then(this.close()) },
+    remove() {
 
-      setColor(color) { return this.item.color = color },
+        // call REST API
+
+        return aettbok.deleteNodeWithLabelAndId('Tag', this.item.id)
+        .catch(error => console.error(error))
+        .finally(() => this.close())
+
+    },
+
+    save() {
+
+        // convert empty strings to null values
+
+        if (!this.item.tag)   { this.item.tag = null }
+        if (!this.item.color) { this.item.color = this.getDefaultTagColor.color }
+
+        // call REST API
+
+        return aettbok.upsertNode(this.item, 'Tag')
+        .catch(error => console.error(error))
+        .finally(() => this.close())
+
+    },
+
+    setColor(color) { return this.item.color = color },
 
   },
 

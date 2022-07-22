@@ -10,13 +10,13 @@
             clearable
             dense
             hide-details
+            item-text="location"
+            item-value="id"
             outlined
         >
-            <template v-slot:append-outer>
-                <div class="mt-n2">
-                    <tooltip-button icon="mdi-map-marker-plus" tooltip="New Location" @click="upsertItem(null)" />
-                </div>
-            </template>
+            <template v-slot:[`item`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
+            <template v-slot:[`selection`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
+            <template v-slot:append-outer><div class="mt-n2"><tooltip-button icon="mdi-map-marker-plus" tooltip="New Location" @click="upsertItem(null)" /></div></template>
         </v-autocomplete>
     </div>
 </template>
@@ -52,7 +52,7 @@ export default {
         }),
 
         getItems() {
-            return this.getLocations.filter(e => e.id !== this.exclude).map(e => { return { text: e.location, value: e.id } })
+            return this.getLocations.filter(e => e.id !== this.exclude)
         },
 
     },
@@ -62,6 +62,9 @@ export default {
         upsertItem(id) { return this.editingItemId = id },
 
         selectItem(id) { return this.$emit('selectedItem', id) },
+
+        getLocationLabel(item) { return `${item.location || ''}`.trim() },
+        getLocationType(item)  { return `${item.locationtypeString || ''}`.trim() },
 
     },
 

@@ -105,7 +105,7 @@ export default {
 
         // call REST API
 
-        return aettbok.upsertEvent(this.item)
+        return aettbok.upsertNode(this.item, 'Event')
         .catch(error => console.error(error))
         .finally(() => this.close())
 

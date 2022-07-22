@@ -290,6 +290,9 @@ function processLocations() {
 
     locations.forEach(location => {
 
+        location.tags = []
+        location.documentedby = []
+
         // partof
 
         location.partof         = getPartOfId(location.id)
@@ -301,7 +304,13 @@ function processLocations() {
         location.relations.filter(e => (e.label === 'LocationType') && (e.direction === 'to')).forEach(relation => {
 
             let locationType = locationTypes.find(e => e.id === relation.id)
-            if (locationType) { location.type = locationType.type }
+            if (locationType) {
+                location.locationtype = locationType.id
+                location.locationtypeString = locationType.type
+            } else {
+                location.locationtype = null
+                location.locationtypeString = null
+            }
 
         })
 
@@ -507,94 +516,19 @@ export function deleteNodeWithLabelAndId(label, id) {
 
 
 
-export function upsertEvent(item) {
+export function upsertNode(node, label) {
     return new Promise((resolve, reject) => {
 
         const token = store.getters.getAuthenticationToken
         const headers = { 'Authorization': `Bearer ${token}` }
 
-        let url = `${process.env.VUE_APP_API_BASE_URL}/Event`
+        let url = `${process.env.VUE_APP_API_BASE_URL}/${label}`
 
-        if (item.id) { url += `/${item.id}` }
-
-        console.warn(item)
+        if (node.id) { url += `/${node.id}` }
 
         return axios
-        .post(url, item, { "headers": headers })
-        .then(() => {
-
-            refreshData()
-            return resolve()
-
-        })
-        .catch(error => reject(error))
-
-    })
-}
-
-export function upsertDocument(item) {
-    return new Promise((resolve, reject) => {
-
-        const token = store.getters.getAuthenticationToken
-        const headers = { 'Authorization': `Bearer ${token}` }
-
-        let url = `${process.env.VUE_APP_API_BASE_URL}/Document`
-
-        if (item.id) { url += `/${item.id}` }
-
-        return axios
-        .post(url, item, { "headers": headers })
-        .then(() => {
-
-            refreshData()
-            return resolve()
-
-        })
-        .catch(error => reject(error))
-
-    })
-}
-export function upsertPerson(item) {
-    return new Promise((resolve, reject) => {
-
-        const token = store.getters.getAuthenticationToken
-        const headers = { 'Authorization': `Bearer ${token}` }
-
-        let url = `${process.env.VUE_APP_API_BASE_URL}/Person`
-
-        if (item.id) { url += `/${item.id}` }
-
-        return axios
-        .post(url, item, { "headers": headers })
-        .then(() => {
-
-            refreshData()
-            return resolve()
-
-        })
-        .catch(error => reject(error))
-
-    })
-}
-
-export function upsertSource(item) {
-    return new Promise((resolve, reject) => {
-
-        const token = store.getters.getAuthenticationToken
-        const headers = { 'Authorization': `Bearer ${token}` }
-
-        let url = `${process.env.VUE_APP_API_BASE_URL}/Source`
-
-        if (item.id) { url += `/${item.id}` }
-
-        return axios
-        .post(url, item, { "headers": headers })
-        .then(() => {
-
-            refreshData()
-            return resolve()
-
-        })
+        .post(url, node, { "headers": headers })
+        .then(() => resolve(refreshData()))
         .catch(error => reject(error))
 
     })
