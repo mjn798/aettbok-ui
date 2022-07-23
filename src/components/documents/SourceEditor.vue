@@ -55,7 +55,7 @@ export default {
         getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Source' },
 
         isEditDialog() { return !([null, undefined].includes(this.id)) },
-        isSaveDisabled() { return false },
+        isSaveDisabled() { return !(this.item && this.item.source && this.item.source.length) },
 
         showDialog() { return this.id !== undefined },
 
@@ -117,7 +117,6 @@ export default {
     }
 
   },
-
 
 }
 </script>

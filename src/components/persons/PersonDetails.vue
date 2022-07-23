@@ -19,7 +19,17 @@
                         <div>{{ getBirthDetails }}</div>
                         <div>{{ getDeathDetails }}</div>
                     </v-card-text>
-                    <v-card-text v-if="selectedPerson.documentedby.length">
+                    <v-card-text>
+                        <tag-chips :selected="selectedPerson.tags" />
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row v-if="selectedPerson.documentedby.length">
+            <v-col cols="12">
+                <v-card>
+                    <v-card-title>Related Documents</v-card-title>
+                    <v-card-text>
                         <v-chip-group column class="ma-2">
                             <v-chip
                                 :key="id"
@@ -51,6 +61,7 @@ import PersonEditor from './PersonEditor.vue'
 import PersonEvents from './PersonEvents.vue'
 import PersonFamily from './PersonFamily.vue'
 import PersonIcon from './PersonIcon.vue'
+import TagChips from '../tags/TagChips.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -63,6 +74,7 @@ export default {
     'person-events': PersonEvents,
     'person-family': PersonFamily,
     'person-icon': PersonIcon,
+    'tag-chips': TagChips,
     'tooltip-button': TooltipButton,
   },
 

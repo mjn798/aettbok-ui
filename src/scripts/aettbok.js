@@ -299,6 +299,10 @@ function processLocations() {
         location.partofLocation = resolvePartOf(location.id, false)
         location.partofResolved = resolvePartOf(location.id, true)
 
+        // tags
+
+        location.tags = location.relations.filter(relation => (relation.label === 'Tag') && (relation.direction === 'to')).map(e => e.id)
+
         // locationtype
 
         location.relations.filter(e => (e.label === 'LocationType') && (e.direction === 'to')).forEach(relation => {

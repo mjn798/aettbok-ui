@@ -26,6 +26,7 @@
                         <v-col cols="12"><location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" label="Part of" /></v-col>
                         <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" /></v-col>
                         <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" /></v-col>
+                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
                     </v-row>
                 </v-container>
             </v-card-text>
@@ -41,6 +42,7 @@ import * as aettbok from '../../scripts/aettbok'
 import CardActions from '../common/CardActions.vue'
 import LocationPicker from './LocationPicker.vue'
 import LocationTypeEditor from './LocationTypeEditor.vue'
+import TagChips from '../tags/TagChips.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -51,6 +53,7 @@ export default {
         'card-actions': CardActions,
         'location-picker': LocationPicker,
         'locationtype-editor': LocationTypeEditor,
+        'tag-chips': TagChips,
         'tooltip-button': TooltipButton,
     },
 
@@ -76,7 +79,7 @@ export default {
         getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Location' },
 
         isEditDialog() { return !([null, undefined].includes(this.id)) },
-        isSaveDisabled() { return false },
+        isSaveDisabled() { return !(this.item && this.item.location && this.item.location.length) },
 
         showDialog() { return this.id !== undefined },
 
@@ -118,6 +121,11 @@ export default {
 
     selectedLocation(id) { return this.item.partof = id },
 
+    toggleTag(id) {
+        let index = this.item.tags.findIndex(e => e === id)
+        return index === -1 ? this.item.tags.push(id) : this.item.tags.splice(index, 1)
+    },
+
   },
 
   watch: {
@@ -140,7 +148,6 @@ export default {
     }
 
   },
-
 
 }
 </script>

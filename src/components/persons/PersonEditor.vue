@@ -8,7 +8,7 @@
                         <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="First Name" outlined v-model="item.firstname" /></v-col>
                         <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Last Name" outlined v-model="item.lastname" /></v-col>
                     </v-row>
-                    <v-row>
+                    <v-row no-gutters>
                         <v-col cols="12" md="6">
                             <v-radio-group class="mx-4" mandatory row v-model="item.gender">
                                 <v-radio color="blue darken-2" label="Male" value="m" />
@@ -26,6 +26,7 @@
                     <v-row no-gutters>
                         <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
                         <v-col cols="12"><person-linker :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" label="Parents" /></v-col>
+                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
                         <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" /></v-col>
                     </v-row>
                 </v-container>
@@ -42,6 +43,7 @@ import * as aettbok from '../../scripts/aettbok'
 import CardActions from '../common/CardActions.vue'
 import DocumentLinker from '../documents/DocumentLinker.vue'
 import PersonLinker from './PersonLinker.vue'
+import TagChips from '../tags/TagChips.vue'
 
 export default {
 
@@ -51,6 +53,7 @@ export default {
         'card-actions': CardActions,
         'document-linker': DocumentLinker,
         'person-linker': PersonLinker,
+        'tag-chips': TagChips,
     },
 
     props: {
@@ -60,6 +63,8 @@ export default {
     data: () => ({
 
         item: { },
+
+        inTagEditMode: false,
 
     }),
 
@@ -132,6 +137,11 @@ export default {
         return index === -1 ? null : this.item.hasparents.splice(index, 1)
     },
 
+    toggleTag(id) {
+        let index = this.item.tags.findIndex(e => e === id)
+        return index === -1 ? this.item.tags.push(id) : this.item.tags.splice(index, 1)
+    },
+
   },
 
   watch: {
@@ -155,7 +165,6 @@ export default {
     }
 
   },
-
 
 }
 </script>
