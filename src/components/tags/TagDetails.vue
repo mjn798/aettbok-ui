@@ -81,7 +81,7 @@ export default {
             return {
                 details: `${(e.birthlong || '')} - ${(e.deathlong || '')}`.trim(),
                 icon: { alive: e.alive, icon: e.icon, iconColor: e.iconColor },
-                label: `${(e.firstname || '')} ${(e.lastname || '')}`.trim(),
+                label: `${(e.lastname || '')} ${(e.firstname || '')}`.trim(),
                 link: `/persons/${e.id}`,
                 type: 'Person',
             }

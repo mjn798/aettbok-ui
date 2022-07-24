@@ -139,18 +139,23 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
-            attended: [],
-            comment: null,
-            documentedby: [],
-            tags: [],
-            day: null,
-            id: null,
-            month: null,
-            type: null,
-            wasin: null,
-            year: null,
-        }}
+        if (id === undefined || id === null) {
+
+            let attended = this.$route.name === 'Persons' ? [this.$route.params.id] : []
+            
+            return this.item = {
+                attended: attended,
+                comment: null,
+                documentedby: [],
+                tags: [],
+                day: null,
+                id: null,
+                month: null,
+                type: null,
+                wasin: null,
+                year: null,
+            }
+        }
 
         return this.item = { ...this.getEvent(id) }
 
