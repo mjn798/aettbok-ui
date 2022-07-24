@@ -79,6 +79,10 @@ export default {
         'tooltip-button': TooltipButton,
     },
 
+    props: {
+        locationFilter: { type: String, default: null },
+    },
+
     data: () => ({
 
         editingItemId: undefined,
@@ -108,9 +112,13 @@ export default {
 
         getFilteredEvents() {
 
-            if (!this.filterState) { return this.getEvents }
+            if (!(this.filterState || this.locationFilter)) { return this.getEvents }
 
             return this.getEvents
+                .filter(e => {
+                    if (!(this.locationFilter && e.wasinString)) { return false }
+                    return (e.wasinString || '').includes(this.locationFilter)
+                })
                 .filter(e => !(this.filterType && this.filterType !== e.typeString))
                 .filter(e => {
                     if (!this.filterHasName) { return true }

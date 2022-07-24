@@ -44,9 +44,12 @@ export default {
 
   methods: {
 
-      upsertItem(id) { return this.editingItemId = id },
+    upsertItem(id) { return this.editingItemId = id },
 
-      toggle(id) { return this.selected.includes(id) ? this.selected.splice(this.selected.findIndex(e => e === id), 1) : this.selected.push(id) },
+    toggle(id) {
+        this.selected.includes(id) ? this.selected.splice(this.selected.findIndex(e => e === id), 1) : this.selected.push(id)
+        return this.$emit('selectionChanged', this.selected)
+    },
 
   }
 
