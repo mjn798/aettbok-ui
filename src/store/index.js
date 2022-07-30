@@ -9,7 +9,7 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    authenticationToken: null,
+    acccessToken: null,
 
     /* LOADING STATUS */
 
@@ -61,9 +61,7 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    getAuthenticationToken: (state) => state.authenticationToken,
-
-    isUserLoggedIn: (state) => state.authenticationToken !== null,
+    getAccessToken: (state) => state.acccessToken,
 
     /* LOADING STATUS */
 
@@ -135,9 +133,11 @@ export default new Vuex.Store({
 
   actions: {
 
-    /* AUTHENTICATION & DATA LOADING */
+    /* AUTHENTICATION */
 
-    setAuthenticationToken({ commit }, token) { return commit('setAuthenticationToken', token) },
+    setAccessToken({ commit }, token) { return commit('setAccessToken', token) },
+
+    /* DATA LOADING */
 
     setDataForLabel({ commit }, data) { return commit('setDataForLabel', data) },
 
@@ -147,7 +147,7 @@ export default new Vuex.Store({
 
   mutations: {
 
-    setAuthenticationToken(state, token) { state.authenticationToken = token },
+    setAccessToken(state, token) { return state.acccessToken = token },
 
     setDataForLabel(state, data) {
 

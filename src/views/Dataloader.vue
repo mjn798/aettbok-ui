@@ -21,7 +21,6 @@ export default {
   computed: {
 
     ...mapGetters({
-      getAuthenticationToken: 'getAuthenticationToken',
       getLoadingStatus: 'getLoadingStatus',
       getProcessingStatus: 'getProcessingStatus',
     }),
@@ -35,13 +34,13 @@ export default {
 
     console.debug('Dataloader:start loading')
 
-    loadResource('Document',     this.getAuthenticationToken)
-    loadResource('Event',        this.getAuthenticationToken)
-    loadResource('Location',     this.getAuthenticationToken)
-    loadResource('LocationType', this.getAuthenticationToken)
-    loadResource('Person',       this.getAuthenticationToken)
-    loadResource('Source',       this.getAuthenticationToken)
-    loadResource('Tag',          this.getAuthenticationToken)
+    loadResource('Document')
+    loadResource('Event')
+    loadResource('Location')
+    loadResource('LocationType')
+    loadResource('Person')
+    loadResource('Source')
+    loadResource('Tag')
 
   },
 

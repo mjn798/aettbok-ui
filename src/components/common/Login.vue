@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import * as authentication from '../../scripts/authentication'
 
 export default {
 
@@ -57,32 +57,14 @@ export default {
 
   methods: {
 
-    ...mapActions({
-      setAuthenticationToken: 'setAuthenticationToken',
-    }),
-
     login() {
 
       this.isLoading = true
 
-      const axios   = require('axios')
-      const data    = { 'username': this.username, 'password': this.password }
-      const headers = { 'Content-Type': 'application/json;charset=utf-8' }
-
-      return axios
-      .post('http://localhost:4000', data, { "headers": headers })
-      .then(result => {
-
-        if (result.status === 200 && result.data && result.data.accessToken) { this.setAuthenticationToken(result.data.accessToken) }
-
-        return this.isLoading = false
-
-      })
-      .catch(() => {
-
-        return this.isLoading = false
-
-      })
+      authentication.login(this.username, this.password)
+      .then(() => console.debug('login:success', this.username))
+      .catch(error => console.error('login:error', error))
+      .finally(() => this.isLoading = false)
 
     },
 

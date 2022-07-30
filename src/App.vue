@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="isUserLoggedIn">
+  <v-app v-if="getAccessToken !== null">
 
     <v-app-bar app>
       <main-menu />
@@ -19,11 +19,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import * as authentication from './scripts/authentication'
 
 import Dataloader from './views/Dataloader.vue'
 import Login from './components/common/Login.vue'
 import MainMenu from './components/common/MainMenu.vue'
-
 
 export default {
 
@@ -38,9 +38,9 @@ export default {
   computed: {
 
     ...mapGetters({
+      getAccessToken: 'getAccessToken',
       isDataProcessed: 'isDataProcessed',
-      isUserLoggedIn: 'isUserLoggedIn',
-    })
+    }),
 
   },
 

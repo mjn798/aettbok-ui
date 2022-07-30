@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const axios = require('axios')
 
 import store from '../store/index'
@@ -67,9 +65,9 @@ function refreshData() {
 
 // load resource from REST API
 
-export function loadResource(label, token) {
+export function loadResource(label) {
 
-    const headers = { 'Authorization': `Bearer ${token}` }
+    const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
 
     return axios
     .get(`${process.env.VUE_APP_API_BASE_URL}/${label}`, { "headers": headers })
@@ -494,8 +492,7 @@ function processTags() {
 export function deleteNodeWithLabelAndId(label, id) {
     return new Promise((resolve, reject) => {
 
-        const token = store.getters.getAuthenticationToken
-        const headers = { 'Authorization': `Bearer ${token}` }
+        const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
 
         let url = `${process.env.VUE_APP_API_BASE_URL}/${label}/${id}`
 
@@ -523,8 +520,7 @@ export function deleteNodeWithLabelAndId(label, id) {
 export function upsertNode(node, label) {
     return new Promise((resolve, reject) => {
 
-        const token = store.getters.getAuthenticationToken
-        const headers = { 'Authorization': `Bearer ${token}` }
+        const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
 
         let url = `${process.env.VUE_APP_API_BASE_URL}/${label}`
 
