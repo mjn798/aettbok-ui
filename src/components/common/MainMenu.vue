@@ -33,6 +33,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import * as authentication from '../../scripts/authentication'
 
 export default {
 
@@ -63,10 +64,16 @@ export default {
   methods: {
 
     ...mapActions({
-      setAuthenticationToken: 'setAuthenticationToken',
+      setAccessToken: 'setAccessToken',
     }),
 
-    logout() { return this.setAuthenticationToken(null) },
+    logout() {
+
+      return authentication.logout()
+      .then(() => this.setAccessToken(null))
+      .catch(() => console.error('authentication:logout:error', error))
+
+    },
 
   },
 

@@ -44,8 +44,25 @@ export function login(username, password) {
         .catch(error => reject(error))
 
     })
-
 }
+
+// logout from authentication session
+
+export function logout() {
+    return new Promise((resolve, reject) => {
+
+        console.debug('authentication:logout')
+
+        let auth = firebaseAuth.getAuth()
+
+        firebaseAuth.signOut(auth)
+        .then(() => resolve(console.debug('authentication:logout:success')))
+        .catch(error => reject(error))
+
+    })
+}
+
+// refresh Access Tokens on regular interval
 
 function tokenRefresh() {
 
