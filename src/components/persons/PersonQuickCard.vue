@@ -18,8 +18,8 @@
                 <person-icon :alive="selectedPerson.alive" :color="selectedPerson.iconColor" :icon="selectedPerson.icon" />
             </v-list-item-icon>
             <v-list-item-content>
-                <v-list-item-title class="mb-1 body-2">{{ getFullName }}</v-list-item-title>
-                <v-list-item-subtitle class="caption">{{ getBirth }} &bull; {{ getDeath }}</v-list-item-subtitle>
+                <v-list-item-title class="mb-1 body-2">{{ selectedPerson.fullname }}</v-list-item-title>
+                <v-list-item-subtitle class="caption">{{ selectedPerson.birthLong }} &bull; {{ selectedPerson.deathlLong }}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
 
@@ -28,7 +28,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getPersonFullName } from '../../scripts/aettbok'
 
 import PersonIcon from './PersonIcon.vue'
 
@@ -53,12 +52,6 @@ export default {
     selectedPerson() { return this.getPerson(this.id) },
 
     getProfileLink() { return '/persons/' + this.id },
-
-    getFullName() { return getPersonFullName(this.selectedPerson) },
-
-    getBirth() { return this.selectedPerson.birthlong },
-
-    getDeath() { return this.selectedPerson.deathlong },
 
   },
 

@@ -70,6 +70,7 @@ function tokenRefresh() {
 
     return setTimeout(function() {
         firebaseAuth.getAuth().currentUser.getIdToken()
+        store.dispatch('setAccessToken', firebaseAuth.getAuth().currentUser.accessToken)
         console.debug('authentication:tokenRefresh')
         return tokenRefresh()
     }, 4 * 60 * 1000)

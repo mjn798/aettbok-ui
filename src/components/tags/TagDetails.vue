@@ -79,7 +79,7 @@ export default {
             return result
         }).map(e => {
             return {
-                details: `${(e.birthlong || '')} - ${(e.deathlong || '')}`.trim(),
+                details: `${(e.birthLong || '')} - ${(e.deathLong || '')}`.trim(),
                 icon: { alive: e.alive, icon: e.icon, iconColor: e.iconColor },
                 label: `${(e.lastname || '')} ${(e.firstname || '')}`.trim(),
                 link: `/persons/${e.id}`,

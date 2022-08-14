@@ -54,8 +54,8 @@
                 <template v-slot:[`item.numberOfDocuments`]="{item}">
                     <tooltip-button :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" small />
                 </template>
-                <template v-slot:[`item.birth`]="{item}">{{ item.birthlong }}</template>
-                <template v-slot:[`item.death`]="{item}">{{ item.deathlong }}</template>
+                <template v-slot:[`item.birth`]="{item}">{{ item.birthLong }}</template>
+                <template v-slot:[`item.death`]="{item}">{{ item.deathLong }}</template>
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -104,9 +104,9 @@ export default {
         { value: 'lastname', text: 'Last Name', sortable: true },
         { value: 'firstname', text: 'First Name', sortable: true },
         { value: 'birth', text: 'Birth', sortable: true },
-        { value: 'birthLocation', text: 'Birth', sortable: true },
+        { value: 'birthLocationString', text: 'Birth', sortable: true },
         { value: 'death', text: 'Death', sortable: true },
-        { value: 'deathLocation', text: 'Death', sortable: true },
+        { value: 'deathLocationString', text: 'Death', sortable: true },
         { value: 'actions', text: 'Actions', sortable: false, width: 110 },
     ]},
 

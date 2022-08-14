@@ -54,7 +54,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getFormattedDate } from '../../scripts/aettbok'
 
 import DocumentEditor from '../documents/DocumentEditor.vue'
 import PersonEditor from './PersonEditor.vue'
@@ -97,17 +96,13 @@ export default {
 
     getBirthDetails() {
 
-        let details = ''
+        let details = (this.selectedPerson.birthFull || '')
 
-        if (this.selectedPerson.birth) { details += getFormattedDate(this.selectedPerson.birthDay, this.selectedPerson.birthMonth, this.selectedPerson.birthYear, 'long') }
+        if (this.selectedPerson.birthLocation) {
 
-        if (this.selectedPerson.birthLocationId) {
+            let location = this.getLocation(this.selectedPerson.birthLocation)
 
-            let location = this.getLocation(this.selectedPerson.birthLocationId)
-
-            details += ' in ' + location.location
-
-            if (location.partofResolved) { details += ', ' + location.partofResolved }
+            details += ` in ${this.selectedPerson.birthLocationString}${location.partofResolved ? ', ' + location.partofResolved : ''}`
 
         }
 
@@ -117,17 +112,13 @@ export default {
 
     getDeathDetails() {
 
-        let details = ''
+        let details = (this.selectedPerson.deathFull || '')
 
-        if (this.selectedPerson.death) { details += getFormattedDate(this.selectedPerson.deathDay, this.selectedPerson.deathMonth, this.selectedPerson.deathYear, 'long') }
+        if (this.selectedPerson.deathLocation) {
 
-        if (this.selectedPerson.deathLocationId) {
+            let location = this.getLocation(this.selectedPerson.deathLocation)
 
-            let location = this.getLocation(this.selectedPerson.deathLocationId)
-
-            details += ' in ' + location.location
-
-            if (location.partofResolved) { details += ', ' + location.partofResolved }
+            details += ` in ${this.selectedPerson.deathLocationString}${location.partofResolved ? ', ' + location.partofResolved : ''}`
 
         }
 

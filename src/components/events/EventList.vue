@@ -56,7 +56,7 @@
                 <template v-slot:[`item.numberOfDocuments`]="{item}">
                     <tooltip-button :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" small />
                 </template>
-                <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
+                <template v-slot:[`item.date`]="{item}">{{ item.dateLong }}</template>
             </v-data-table>
         </v-card-text>
     </v-card>

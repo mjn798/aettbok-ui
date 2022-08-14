@@ -17,7 +17,7 @@
                 <template v-slot:[`item.actions`]="{item}">
                     <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Document" />
                 </template>
-                <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
+                <template v-slot:[`item.date`]="{item}">{{ item.dateLong }}</template>
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -53,7 +53,7 @@ export default {
         }),
 
         getTableHeaders() { return [
-            { value: 'sourcedbyName', text: 'Source', sortable: true },
+            { value: 'sourcedbyString', text: 'Source', sortable: true },
             { value: 'index', text: 'Document Index', sortable: true },
             { value: 'date', text: 'Date', sortable: true },
             { value: 'actions', text: 'Actions', sortable: false, width: 110 },

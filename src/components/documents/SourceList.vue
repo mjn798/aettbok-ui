@@ -52,7 +52,7 @@ export default {
         }),
 
         getTableHeaders() { return [
-            { value: 'storedin-name', text: 'Stored in', sortable: true },
+            { value: 'storedinString', text: 'Stored in', sortable: true },
             { value: 'source', text: 'Source', sortable: true },
             { value: 'actions', text: 'Actions', sortable: false, width: 110 },
         ]},
