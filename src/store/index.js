@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { processResource } from '../scripts/aettbok'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -71,6 +73,26 @@ export default new Vuex.Store({
     isDataLoaded: (state) => (state.loadedDocuments + state.loadedEvents + state.loadedLocations + state.loadedLocationTypes + state.loadedPersons + state.loadedSources + state.loadedTags) / 7 === 1,
     isDataProcessed: (state) => (state.processedDocuments + state.processedEvents + state.processedLocations + state.processedLocationTypes + state.processedPersons + state.processedSources + state.processedTags) / 7 === 1,
 
+    /* NODES */
+
+    getNodesForLabel: (_state, getters) => (label) => {
+
+      switch(label) {
+
+        case 'Document':     return getters.getDocuments
+        case 'Event':        return getters.getEvents
+        case 'Location':     return getters.getLocations
+        case 'LocationType': return getters.getLocationTypes
+        case 'Person':       return getters.getPersons
+        case 'Source':       return getters.getSources
+        case 'Tag':          return getters.getTags
+
+        default: return []
+
+      }
+
+    },
+
     /* DOCUMENTS */
 
     getDocument: (state) => (id) => state.documents.find(e => e.id === id),
@@ -101,16 +123,8 @@ export default new Vuex.Store({
 
     getPerson: (state) => (id) => state.persons.find(e => e.id === id),
 
-    getPersons: (state) => state.persons.sort((a, b) => {
-      if (!a.firstname) return 1
-      if (!b.firstname) return -1
-      return a.firstname.toUpperCase().localeCompare(b.firstname.toUpperCase())
-    })
-    .sort((a, b) => {
-      if (!a.lastname) return 1
-      if (!b.lastname) return -1
-      return a.lastname.toUpperCase().localeCompare(b.lastname.toUpperCase())
-    }),
+    getPersons: (state) => state.persons.sort((a, b) => (a.firstname || '').toUpperCase().localeCompare((b.firstname || '').toUpperCase()))
+                                        .sort((a, b) => (a.lastname || '').toUpperCase().localeCompare((b.lastname || '').toUpperCase())),
 
     /* SOURCES */
 
@@ -141,13 +155,51 @@ export default new Vuex.Store({
 
     setDataForLabel({ commit }, data) { return commit('setDataForLabel', data) },
 
-    refreshData({ commit }) { return commit('refreshData') }
+    refreshData({ commit }) { return commit('refreshData') },
+
+    /* NODES */
+
+    deleteNode({ commit, getters }, data) { return commit('deleteNode', { data, getters}) },
 
   },
 
   mutations: {
 
-    setAccessToken(state, token) { return state.acccessToken = token },
+    setAccessToken: (state, token) => state.acccessToken = token,
+
+    deleteNode(state, { data, getters }) {
+
+      let nodes = getters.getNodesForLabel(data.label)
+      let index = nodes.findIndex(e => e.id === data.id)
+
+      // if node with id does not exist = error
+      if (index < 0) { return console.error('store:deleteNode:error', `${data.id} not found for ${data.label}`) }
+
+      // remove index from nodes
+      nodes = nodes.splice(index, 1)
+
+      // adjust all relations
+      state.documents.forEach(node =>     node.relations = node.relations.filter(e => e.id !== data.id))
+      state.events.forEach(node =>        node.relations = node.relations.filter(e => e.id !== data.id))
+      state.locations.forEach(node =>     node.relations = node.relations.filter(e => e.id !== data.id))
+      state.locationtypes.forEach(node => node.relations = node.relations.filter(e => e.id !== data.id))
+      state.persons.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
+      state.sources.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
+      state.tags.forEach(node =>          node.relations = node.relations.filter(e => e.id !== data.id))
+
+      // process all nodes to remove node from relations
+      processResource('Document')
+      processResource('Event')
+      processResource('Location')
+      processResource('LocationType')
+      processResource('Person')
+      processResource('Source')
+      processResource('Tag')
+
+      // everything ok
+      console.debug('store:deleteNode:success', `${data.id} deleted for ${data.label}`)
+
+    },
 
     setDataForLabel(state, data) {
 

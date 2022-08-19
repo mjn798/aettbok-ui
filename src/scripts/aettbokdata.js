@@ -21,7 +21,7 @@ function extractRelations(relations, label, direction) {
     return relations
         .filter(relation => (relation.label === label) && (relation.direction === direction))
         .map(relation => {
-            let node = getRelatedNodes(label).find(e => e.id === relation.id)
+            let node = store.getters.getNodesForLabel(label).find(e => e.id === relation.id)
             if (node) { return node.id }
         })
 }
@@ -106,26 +106,6 @@ function getSortableDate(day, month, year) { return `${year ? year.toString().pa
 /* SWITCHES */
 
 
-
-// get nodes for label from store
-
-function getRelatedNodes(label) {
-
-    switch(label) {
-
-        case 'Document':     return store.getters.getDocuments
-        case 'Event':        return store.getters.getEvents
-        case 'Location':     return store.getters.getLocations
-        case 'LocationType': return store.getters.getLocationTypes
-        case 'Person':       return store.getters.getPersons
-        case 'Source':       return store.getters.getSources
-        case 'Tag':          return store.getters.getTags
-
-        default: return []
-
-    }
-
-}
 
 // get formatted event type string
 
@@ -246,7 +226,7 @@ export function processEvents() {
 
 export function processLocations() {
 
-    let locations     = store.getters.getLocations
+    let locations = store.getters.getLocations
 
     locations.forEach(location => {
 

@@ -49,11 +49,9 @@ export function loadResource(label) {
     .get(`${process.env.VUE_APP_API_BASE_URL}/${label}`, { "headers": headers })
     .then(result => {
 
-        // resolve some of the relationships
-
         console.debug(`aettbok:loadResource`, label, result.data)
 
-        store.dispatch('setDataForLabel', { label: label, data: result.data, loaded: true })
+        return store.dispatch('setDataForLabel', { label: label, data: result.data, loaded: true })
 
     })
     .catch(() => console.error(`aettbok:loadResource:Error during loading "${label}"`))
@@ -73,10 +71,9 @@ export function deleteNodeWithLabelAndId(label, id) {
         .delete(url, { "headers": headers })
         .then(result => {
 
-            if (result.status !== 204) { reject(result.status) }
+            if (result.status !== 204) { return reject(result.status) }
 
-            refreshData()
-            return resolve()
+            return resolve(store.dispatch('deleteNode', { label: label, id: id }))
 
         })
         .catch(error => reject(error))
