@@ -10,8 +10,8 @@
             <v-container>
               <v-row no-gutters>
                 <v-form>
-                  <v-col cols="12"><v-text-field class="ma-2" hide-details label="Username" prepend-icon="mdi-email" v-model="username" /></v-col>
-                  <v-col cols="12"><v-text-field class="ma-2" hide-details label="Password" prepend-icon="mdi-lock-outline" type="password" v-model="password" /></v-col>
+                  <v-col cols="12"><v-text-field autocomplete="username" class="ma-2" hide-details label="Username" prepend-icon="mdi-email" v-model="username" /></v-col>
+                  <v-col cols="12"><v-text-field autocomplete="current-password" class="ma-2" hide-details label="Password" prepend-icon="mdi-lock-outline" type="password" v-model="password" /></v-col>
                   <v-col cols="12">
                     <v-btn
                       :dark="!isDisabled"

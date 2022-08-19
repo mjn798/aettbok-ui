@@ -20,7 +20,7 @@
                 <v-card>
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-subtitle>{{ event.datelong || '' }} {{ event.wasinString ? `in ${event.wasinString}` : '' }}</v-list-item-subtitle>
+                            <v-list-item-subtitle>{{ event.dateFull || '' }} {{ event.wasinString ? `in ${event.wasinString}` : '' }}</v-list-item-subtitle>
                             <v-list-item-subtitle v-if="event.comment">{{ event.comment }}</v-list-item-subtitle>
                             <v-list-item-subtitle v-if="event.documentedby.length">
                                 <v-chip-group column class="ma-2">
