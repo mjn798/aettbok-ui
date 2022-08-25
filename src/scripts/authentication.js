@@ -69,9 +69,14 @@ function tokenRefresh() {
     // regularly check the access token for expiration and require a new one if needed
 
     return setTimeout(function() {
+
         firebaseAuth.getAuth().currentUser.getIdToken()
-        store.dispatch('setAccessToken', firebaseAuth.getAuth().currentUser.accessToken)
-        console.debug('authentication:tokenRefresh')
+        .then(token => {
+            console.debug('authentication:tokenRefresh')
+            store.dispatch('setAccessToken', token)
+        })
+        .catch(error => console.error('authentication:tokenRefresh:error', error))
+
         return tokenRefresh()
     }, 4 * 60 * 1000)
 
