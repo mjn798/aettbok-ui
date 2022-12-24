@@ -5,9 +5,7 @@
             :filterIconState="filterState"
             @click="upsertItem(null)"
             @filter="toggleFilter"
-            actionIcon="mdi-account-plus"
-            actionTooltip="New Person"
-            title="Persons"
+            titletype="person"
         />
         <v-card-text>
             <v-expand-transition>

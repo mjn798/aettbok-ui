@@ -3,9 +3,7 @@
         <source-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <card-title
             @click="upsertItem(null)"
-            actionIcon="mdi-book-plus-multiple"
-            actionTooltip="New Source"
-            title="Sources"
+            titletype="source"
         />
         <v-card-text>
             <v-data-table

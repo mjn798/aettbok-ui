@@ -4,9 +4,7 @@
         <v-card>
             <card-title
                 @click="upsertItem(null)"
-                actionIcon="mdi-home-plus"
-                actionTooltip="New Location Type"
-                title="Location Types"
+                titletype="locationtype"
             />
             <v-card-text>
                 <v-data-table

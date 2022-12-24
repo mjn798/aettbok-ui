@@ -4,9 +4,7 @@
         <document-editor :id="viewingDocument" @close="viewDocument(undefined)" />
         <card-title
             @click="upsertItem(null)"
-            actionIcon="mdi-calendar-plus"
-            actionTooltip="New Event"
-            title="Personal Events"
+            titletype="event"
         />
         <v-timeline dense class="mx-4">
             <v-timeline-item

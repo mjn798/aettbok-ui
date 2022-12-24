@@ -3,9 +3,7 @@
         <document-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <card-title
             @click="upsertItem(null)"
-            actionIcon="mdi-note-plus"
-            actionTooltip="New Document"
-            title="Documents"
+            titletype="document"
         />
         <v-card-text>
             <v-data-table

@@ -5,9 +5,7 @@
             :filterIconState="filterState"
             @click="upsertItem(null)"
             @filter="toggleFilter"
-            actionIcon="mdi-calendar-plus"
-            actionTooltip="New Event"
-            title="Events"
+            titletype="event"
         />
         <v-card-text>
             <v-expand-transition>

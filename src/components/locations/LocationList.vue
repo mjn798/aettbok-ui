@@ -5,9 +5,7 @@
             :filterIconState="filterState"
             @click="upsertItem(null)"
             @filter="toggleFilter"
-            actionIcon="mdi-map-marker-plus"
-            actionTooltip="New Location"
-            title="Locations"
+            titletype="location"
         />
         <v-card-text>
             <v-expand-transition>

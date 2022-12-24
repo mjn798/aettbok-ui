@@ -32,8 +32,8 @@ export default {
       disabled: { type: Boolean, default: false },
       icon: { type: String, default: 'mdi-alert-decagram' },
       small: { type: Boolean, default: false },
-      tooltip: { type: String, default: 'n/a' },
       to: { type: String, default: null },
+      tooltip: { type: String, default: 'n/a' },
   },
 
   methods: {

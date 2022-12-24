@@ -36,7 +36,7 @@
                     </div>
                 </v-expand-transition>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -49,91 +49,88 @@ import CardActions from '../common/CardActions.vue'
 
 export default {
 
-  name: 'TagEditor',
+    name: 'TagEditor',
 
-  components: {
-      'card-actions': CardActions,
-  },
+    components: {
+        'card-actions': CardActions,
+    },
 
-  props: {
-      id: { type: String, default: undefined },
-  },
+    props: {
+        id: { type: String, default: undefined },
+    },
 
-  data: () => ({
+    data: () => ({
 
-      item: { },
+        item: { },
 
-      inColorEditMode: false,
+        inColorEditMode: false,
 
-  }),
+    }),
 
-  computed: {
+    computed: {
 
-      ...mapGetters({
-          getTag: 'getTag',
-          getSortedTagColors: 'getSortedTagColors',
-          getDefaultTagColor: 'getDefaultTagColor',
-      }),
+        ...mapGetters({
+            getDefaultTagColor: 'getDefaultTagColor',
+            getSortedTagColors: 'getSortedTagColors',
+            getTag: 'getTag',
+        }),
 
-      getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Tag'},
+        showDialog() { return this.id !== undefined },
 
-      isEditDialog() { return !([null, undefined].includes(this.id)) },
-      isSaveDisabled() { return !(this.item && this.item.tag && this.item.tag.length) },
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Tag'},
 
-      showDialog() { return this.id !== undefined },
-
-  },
-
-  methods: {
-
-    close()  { return this.$emit('close') },
-
-    remove() {
-
-        // call REST API
-
-        return aettbok.deleteNodeWithLabelAndId('Tag', this.item.id)
-        .catch(error => console.error(error))
-        .finally(() => this.close())
+        isNewDialog() { return !this.id },
+        isSaveDisabled() { return !(this.item.tag && this.item.tag.trim()) },
 
     },
 
-    save() {
+    methods: {
 
-        // convert empty strings to null values
+        close()  { return this.$emit('close') },
 
-        if (!this.item.tag)   { this.item.tag = null }
-        if (!this.item.color) { this.item.color = this.getDefaultTagColor.color }
+        remove() {
 
-        // call REST API
+            // call REST API
 
-        return aettbok.upsertNode(this.item, 'Tag')
-        .catch(error => console.error(error))
-        .finally(() => this.close())
+            return aettbok.deleteNodeWithLabelAndId('Tag', this.item.id)
+            .catch(error => console.error(error))
+            .finally(() => this.close())
+
+        },
+
+        save() {
+
+            this.item.tag = this.item.tag.trim()
+
+            // call REST API
+
+            return aettbok.upsertNode(this.item, 'Tag')
+            .catch(error => console.error(error))
+            .finally(() => this.close())
+
+        },
+
+        setColor(color) { return this.item.color = color },
 
     },
 
-    setColor(color) { return this.item.color = color },
+    watch: {
 
-  },
+        id: function(id) {
 
-  watch: {
+            this.inColorEditMode = false
 
-    id: function(id) {
+            if (id) { return this.item = { ...this.getTag(id) }}
 
-        this.inColorEditMode = false
+            return this.item = {
+                id: null,
+                tag: null,
+                color: this.getDefaultTagColor.color
+            }
 
-        if (id === undefined || id === null) { return this.item = {
-            id: null,
-            tag: null,
-            color: this.getDefaultTagColor.color
-        }}
+        }
 
-        return this.item = { ...this.getTag(id) }
-
-    }
-
-  },
+    },
 
 }
 </script>
