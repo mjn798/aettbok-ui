@@ -20,7 +20,7 @@
                                 outlined
                                 v-model="item.locationtype"
                             >
-                                <template v-slot:append-outer><div class="mt-n4"><tooltip-button @click="showLocationTypeEditor = true" icon="mdi-home-edit" tooltip="Edit Location Types" /></div></template>
+                                <template v-slot:append-outer><div class="mt-n3"><tooltip-button @click="showLocationTypeEditor = true" icon="mdi-home-edit" tooltip="Edit Location Types" /></div></template>
                             </v-autocomplete>
                         </v-col>
                         <v-col cols="12"><location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" label="Part of" /></v-col>
@@ -30,7 +30,7 @@
                     </v-row>
                 </v-container>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -76,20 +76,18 @@ export default {
             getLocationTypes: 'getLocationTypes',
         }),
 
-        getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Location' },
-
-        isEditDialog() { return !([null, undefined].includes(this.id)) },
-        isSaveDisabled() { return !(this.item && this.item.location && this.item.location.length) },
-
         showDialog() { return this.id !== undefined },
+
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Location' },
+
+        isNewDialog() { return !this.id },
+        isSaveDisabled() { return !(this.item && this.item.location && this.item.location.length) },
 
     },
 
   methods: {
 
     close() { return this.$emit('close') },
-
-    closeLocationTypeEditor() { return this.showLocationTypeEditor = false },
 
     remove() {
 
@@ -119,12 +117,11 @@ export default {
 
     },
 
+    closeLocationTypeEditor() { return this.showLocationTypeEditor = false },
+
     selectedLocation(id) { return this.item.partof = id },
 
-    toggleTag(id) {
-        let index = this.item.tags.findIndex(e => e === id)
-        return index === -1 ? this.item.tags.push(id) : this.item.tags.splice(index, 1)
-    },
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) }
 
   },
 
@@ -132,7 +129,9 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getLocation(id))) }
+
+        return this.item = {
             id: null,
             documentedby: [],
             latitude: null,
@@ -141,9 +140,7 @@ export default {
             longitude: null,
             partof: null,
             tags: [],
-        }}
-
-        return this.item = { ...this.getLocation(id) }
+        }
 
     }
 

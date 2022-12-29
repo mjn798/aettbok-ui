@@ -4,7 +4,7 @@
             :filter="filterPersons"
             :items="getPersons"
             :label="label"
-            class="ma-2"
+            class="mx-2 mt-2 mb-n1"
             dense
             hide-details
             item-value="id"
@@ -16,28 +16,22 @@
             <template v-slot:append-outer>
                 <div class="mt-n2">
                     <tooltip-button
-                    :disabled="selectedPerson === null"
-                    @click="linkPerson"
-                    icon="mdi-link"
-                    tooltip="Link Person"
+                        :disabled="selectedPerson === null"
+                        @click="linkPerson"
+                        icon="mdi-link"
+                        tooltip="Link Person"
                     />
                 </div>
             </template>
         </v-autocomplete>
-        <v-chip-group column class="ma-2" v-if="persons.length">
-            <v-chip
-                :color="getColor(getPerson(id))"
-                :key="id"
-                @click:close="unlinkPerson(id)"
-                close
-                close-icon="mdi-link-off"
-                label
-                outlined
-                v-for="id in persons"
-            >
-                {{ getLabel(getPerson(id)) }}
-                <small class="ml-2">{{ getDates(getPerson(id)) }}</small>
-            </v-chip>
+        <v-chip-group class="mx-1 mb-3" column v-if="persons.length">
+            <person-chip
+                :key="person"
+                :id="person"
+                @closed="unlinkPerson"
+                closeicon="mdi-link-off"
+                v-for="person in persons"
+            />
         </v-chip-group>
     </div>
 </template>
@@ -45,6 +39,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import PersonChip from './PersonChip.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -52,6 +47,7 @@ export default {
     name: 'PersonLinker',
 
     components: {
+        'person-chip': PersonChip,
         'tooltip-button': TooltipButton,
     },
 

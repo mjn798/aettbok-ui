@@ -15,7 +15,7 @@ export default {
 
     computed: {
 
-        getClass() { return this.alive ? '' : 'deceased' }
+        getClass() { return this.alive || 'deceased' }
 
     },
 

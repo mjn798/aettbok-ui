@@ -10,6 +10,7 @@ const routes = [
   { path: '/events',         name: 'Events',    component: () => import('../views/Events.vue') },
   { path: '/locations/:id?', name: 'Locations', component: () => import('../views/Locations.vue') },
   { path: '/persons/:id?',   name: 'Persons',   component: () => import('../views/Persons.vue') },
+  { path: '/sources',        name: 'Sources',   component: () => import('../views/Sources.vue') },
   { path: '/tags',           name: 'Tags',      component: () => import('../views/Tags.vue') },
 ]
 

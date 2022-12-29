@@ -120,12 +120,12 @@ export default {
 
             this.inColorEditMode = false
 
-            if (id) { return this.item = { ...this.getTag(id) }}
+            if (id) { return this.item = JSON.parse(JSON.stringify(this.getTag(id))) }
 
             return this.item = {
                 id: null,
+                color: this.getDefaultTagColor.color,
                 tag: null,
-                color: this.getDefaultTagColor.color
             }
 
         }

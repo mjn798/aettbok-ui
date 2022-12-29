@@ -13,7 +13,7 @@
                     </v-row>
                 </v-container>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -52,12 +52,12 @@ export default {
             getSource: 'getSource',
         }),
 
-        getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Source' },
-
-        isEditDialog() { return !([null, undefined].includes(this.id)) },
-        isSaveDisabled() { return !(this.item && this.item.source && this.item.source.length) },
-
         showDialog() { return this.id !== undefined },
+
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Source' },
+
+        isNewDialog() { return !this.id },
+        isSaveDisabled() { return !(this.item && this.item.source && this.item.source.length) },
 
     },
 
@@ -102,7 +102,9 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getSource(id))) }
+
+        return this.item = {
             author: null,
             containedin: null,
             id: null,
@@ -110,9 +112,7 @@ export default {
             source: null,
             storedin: null,
             tags: [],
-        }}
-
-        return this.item = { ...this.getSource(id) }
+        }
 
     }
 

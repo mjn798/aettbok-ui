@@ -13,10 +13,10 @@
                 />
                 <div class="ma-2">
                     <v-chip
+                        :dark="hierarchy === item.hierarchy"
                         :key="hierarchy"
                         @click="setHierarchy(hierarchy)"
                         class="ma-1"
-                        :dark="hierarchy === item.hierarchy"
                         small
                         v-for="hierarchy in getSortedHierarchy"
                     >
@@ -27,7 +27,7 @@
                     </v-chip>
                 </div>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -62,12 +62,12 @@ export default {
           getLocationType: 'getLocationType',
       }),
 
-      getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Location Type'},
-
-      isEditDialog() { return !([null, undefined].includes(this.id)) },
-      isSaveDisabled() { return !(this.item && this.item.type && this.item.type.length) },
-
       showDialog() { return this.id !== undefined },
+
+      getDialogTitle() { return (this.isNewDialog ? 'Neu ' : 'Edit ') + 'Location Type'},
+
+      isNewDialog() { return !this.id },
+      isSaveDisabled() { return !(this.item.type && this.item.type.trim()) },
 
       getSortedHierarchy() { return [1, 2, 3, 4, 5, 6, 7, 8, 9] },
 
@@ -91,8 +91,7 @@ export default {
 
         // convert empty strings to null values
 
-        if (!this.item.type)      { this.item.type = null }
-        if (!this.item.hierarchy) { this.item.hierarchy = 1 }
+        if (!this.item.type) { this.item.type = null }
 
         // call REST API
 
@@ -110,13 +109,13 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
-            id: null,
-            type: null,
-            hierarchy: 1
-        }}
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getLocationType(id))) }
 
-        return this.item = { ...this.getLocationType(id) }
+        return this.item = {
+            id: null,
+            hierarchy: 1,
+            type: null,
+        }
 
     }
 

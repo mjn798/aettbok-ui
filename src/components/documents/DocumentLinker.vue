@@ -3,7 +3,7 @@
         <v-autocomplete
             :filter="filterDocuments"
             :items="getDocuments"
-            class="ma-2"
+            class="mx-2 mt-2 mb-n1"
             dense
             hide-details
             item-value="id"
@@ -11,8 +11,8 @@
             outlined
             v-model="selectedDocument"
         >
-            <template v-slot:[`item`]="{item}">{{ getLabel(item) }}</template>
-            <template v-slot:[`selection`]="{item}">{{ getLabel(item) }}</template>
+            <template v-slot:[`item`]="{item}"><small class="mr-2">{{ item.sourcedbyString }}</small>{{ item.index }}</template>
+            <template v-slot:[`selection`]="{item}"><small class="mr-2">{{ item.sourcedbyString }}</small>{{ item.index }}</template>
             <template v-slot:append-outer>
                 <div class="mt-n2">
                     <tooltip-button
@@ -24,25 +24,21 @@
                 </div>
             </template>
         </v-autocomplete>
-        <v-chip-group column class="ma-2" v-if="documents.length">
-            <v-chip
-                :key="id"
-                @click:close="unlinkDocument(id)"
-                close
-                close-icon="mdi-link-off"
-                label
-                outlined
-                v-for="id in documents"
-            >
-                {{ getTagLabel(id) }}
-            </v-chip>
-        </v-chip-group>
+        <div class="mx-1 mb-3">
+            <document-viewer-list
+                :listofids="documents"
+                @closed="unlinkDocument"
+                closeicon="mdi-link-off"
+                v-if="documents.length"
+            />
+        </div>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
+import DocumentViewerList from '../documents/DocumentViewerList.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -50,6 +46,7 @@ export default {
     name: 'DocumentEditor',
 
     components: {
+        'document-viewer-list': DocumentViewerList,
         'tooltip-button': TooltipButton,
     },
 
@@ -74,11 +71,7 @@ export default {
 
   methods: {
 
-    filterDocuments(item, queryText, itemText) { return true },
-
-    getLabel(item) { return item.tagLabel || '' },
-
-    getTagLabel(id) { return this.getDocument(id).tagLabel },
+    filterDocuments(item, queryText, itemText) { return (item.sourcedbyString || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) || (item.index || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) },
 
     linkDocument() {
         this.$emit('linkedDocument', this.selectedDocument)

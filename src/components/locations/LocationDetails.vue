@@ -1,73 +1,62 @@
 <template>
-    <v-container class="ma-0 pa-0">
+    <v-card>
         <location-editor :id="editingItemId" @close="upsertItem(undefined)" />
-        <v-row no-gutters>
-            <v-col cols="12">
-                <v-card flat>
-                    <v-card-title>
-                        <div class="text-h4">{{ selectedLocation.location }}</div>
-                        <v-spacer/>
-                        <tooltip-button
-                            @click="upsertItem($route.params.id)"
-                            icon="mdi-map-marker"
-                            tooltip="Edit Location"
-                        />
-                    </v-card-title>
-                    <v-card-text>
-                        <div>{{ `${selectedLocation.locationtypeString} in ${selectedLocation.partofResolved}` }}</div>
-                    </v-card-text>
-                    <v-card-text>
-                        <tag-chips :selected="selectedLocation.tags" />
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="12"><event-list :locationFilter="selectedLocation.location" /></v-col>
-        </v-row>
-    </v-container>
+        <v-card-title>
+            <div>{{ selectedLocation.location }}</div>
+            <v-spacer/>
+            <tooltip-button
+                @click="upsertItem($route.params.id)"
+                icon="mdi-map-marker"
+                tooltip="Edit Location"
+            />
+        </v-card-title>
+        <v-card-text>
+            {{ `${selectedLocation.locationtypeString} ${selectedLocation.partofResolved ? 'in ' + selectedLocation.partofResolved : ''}`.trim() }}
+        </v-card-text>
+        <v-card-text v-if="selectedLocation.tags.length"><tag-chips :selected="selectedLocation.tags" /></v-card-text>
+    </v-card>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
-import EventList from '../events/EventList.vue'
+import CardTitle from '../common/CardTitle.vue'
 import LocationEditor from './LocationEditor.vue'
 import TagChips from '../tags/TagChips.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
 
-  name: 'LocationDetails',
+    name: 'LocationDetails',
 
-  components: {
-    'event-list': EventList,
-    'location-editor': LocationEditor,
-    'tag-chips': TagChips,
-    'tooltip-button': TooltipButton,
-  },
+    components: {
+        'card-title': CardTitle,
+        'location-editor': LocationEditor,
+        'tag-chips': TagChips,
+        'tooltip-button': TooltipButton,
+    },
 
-  data: () => ({
+    data: () => ({
 
-    editingItemId: undefined,
+        editingItemId: undefined,
 
-  }),
-
-  computed: {
-
-    ...mapGetters({
-        getLocation: 'getLocation',
     }),
 
-    selectedLocation() { return this.getLocation(this.$route.params.id) },
+    computed: {
 
-  },
+        ...mapGetters({
+            getLocation: 'getLocation',
+        }),
 
-  methods: {
+        selectedLocation() { return this.getLocation(this.$route.params.id) },
 
-    upsertItem(id) { return this.editingItemId = id },
+    },
 
-  },
+    methods: {
+
+        upsertItem(id) { return this.editingItemId = id },
+
+    },
 
 }
 </script>

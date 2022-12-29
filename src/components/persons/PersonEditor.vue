@@ -24,14 +24,14 @@
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
-                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
                         <v-col cols="12"><person-linker :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" label="Parents" /></v-col>
-                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
+                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
                         <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" /></v-col>
+                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
                     </v-row>
                 </v-container>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -64,8 +64,6 @@ export default {
 
         item: { },
 
-        inTagEditMode: false,
-
     }),
 
     computed: {
@@ -74,13 +72,13 @@ export default {
             getPerson: 'getPerson',
         }),
 
-        getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Person' },
+        showDialog() { return this.id !== undefined },
 
-        isEditDialog() { return !([null, undefined].includes(this.id)) },
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Person' },
+
+        isNewDialog() { return !this.id },
         isSaveDisabled() { return !(this.item && this.item.firstname && this.item.firstname.length) &&
                                   !(this.item && this.item.lastname && this.item.lastname.length) },
-
-        showDialog() { return this.id !== undefined }
 
     },
 
@@ -102,11 +100,8 @@ export default {
 
         // convert empty strings to null values
 
-        if (!this.item.alive)     { this.item.alive = false }
-
         if (!this.item.firstname) { this.item.firstname = null }
         if (!this.item.lastname)  { this.item.lastname = null }
-        if (!this.item.gender)    { this.item.gender = 'u' }
         if (!this.item.notes)     { this.item.notes = null }
 
         // call REST API
@@ -118,13 +113,13 @@ export default {
     },
 
     linkedDocument(id) {
-        let index = this.item.documentedby.findIndex(e => e === id)
-        return index === -1 ? this.item.documentedby.push(id) : null
+        if (this.item.documentedby.includes(id)) { return }
+        return this.item.documentedby.push(id)
     },
 
     linkedParent(id) {
-        let index = this.item.hasparents.findIndex(e => e === id)
-        return index === -1 ? this.item.hasparents.push(id) : null
+        if (this.item.hasparents.includes(id)) { return }
+        return this.item.hasparents.push(id)
     },
 
     unlinkedDocument(id) {
@@ -137,10 +132,7 @@ export default {
         return index === -1 ? null : this.item.hasparents.splice(index, 1)
     },
 
-    toggleTag(id) {
-        let index = this.item.tags.findIndex(e => e === id)
-        return index === -1 ? this.item.tags.push(id) : this.item.tags.splice(index, 1)
-    },
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) }
 
   },
 
@@ -148,7 +140,9 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getPerson(id))) }
+
+        return this.item = {
             id: null,
             alive: false,
             documentedby: [],
@@ -158,9 +152,7 @@ export default {
             lastname: null,
             notes: null,
             tags: [],
-        }}
-
-        return this.item = { ...this.getPerson(id) }
+        }
 
     }
 

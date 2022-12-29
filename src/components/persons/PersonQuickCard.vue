@@ -3,7 +3,6 @@
         class="ma-1"
         height="59"
     >
-
         <v-list-item disabled v-if="id === 'unknown'">
             <v-list-item-icon>
                 <person-icon :alive="false" color="grey" icon="mdi-human-male-female" />
@@ -12,7 +11,6 @@
                 <v-list-item-title class="mb-1 body-2">Unknown</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-
         <v-list-item :to="getProfileLink" v-else>
             <v-list-item-icon>
                 <person-icon :alive="selectedPerson.alive" :color="selectedPerson.iconColor" :icon="selectedPerson.icon" />
@@ -22,7 +20,6 @@
                 <v-list-item-subtitle class="caption">{{ selectedPerson.birthLong }} &bull; {{ selectedPerson.deathlLong }}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
-
     </v-card>
 </template>
 
@@ -51,7 +48,7 @@ export default {
 
     selectedPerson() { return this.getPerson(this.id) },
 
-    getProfileLink() { return '/persons/' + this.id },
+    getProfileLink() { return `/persons/${this.id}` },
 
   },
 

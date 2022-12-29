@@ -13,7 +13,7 @@
                     </v-row>
                 </v-container>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -24,7 +24,7 @@ import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
-import SourcePicker from './SourcePicker.vue'
+import SourcePicker from '../sources/SourcePicker.vue'
 
 export default {
 
@@ -53,12 +53,12 @@ export default {
             getSources: 'getSources',
         }),
 
-        getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Document' },
+        showDialog() { return this.id !== undefined },
 
-        isEditDialog() { return !([null, undefined].includes(this.id)) },
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Document' },
+
+        isNewDialog() { return !this.id },
         isSaveDisabled() { return false },
-
-        showDialog() { return this.id !== undefined }
 
     },
 
@@ -112,7 +112,9 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) { return this.item = {
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getDocument(id))) }
+
+        return this.item = {
             content: null,
             date: null,
             id: null,
@@ -120,9 +122,7 @@ export default {
             persons: [],
             sourcedby: null,
             tags: [],
-        }}
-
-        return this.item = { ...this.getDocument(id) }
+        }
 
     }
 

@@ -11,16 +11,28 @@
       <v-card-text>
         <v-expand-transition>
           <v-card v-if="filterState">
-            <v-card-text>
+            <v-card-title>
               <tooltip-button
                 :color="isTypeSelected(type.type) ? 'grey lighten-1' : 'grey lighten-2'"
                 :icon="type.icon"
                 :key="type.type"
                 :tooltip="`${isTypeSelected(type.type) ? 'Showing' : 'Hiding'} ${type.type}`"
                 @click="toggleFilterType(type.type)"
-                v-for="type in getFilterTypesAllowed"
+                v-for="type in filterTypesAllowed"
               />
-            </v-card-text>
+              <v-spacer/>
+              <v-text-field
+                  class="ma-2"
+                  clearable
+                  dense
+                  hide-details
+                  label="Search"
+                  outlined
+                  prepend-inner-icon="mdi-magnify"
+                  v-model="filterHasName"
+              />
+            </v-card-title>
+            <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
           </v-card>
         </v-expand-transition>
       </v-card-text>
@@ -36,12 +48,10 @@
       </v-card-text>
       <v-card-text>
         <v-data-table
-          :headers="getTableHeaders"
-          :items="getTaggedNodes"
-          disable-pagination
-          hide-default-footer
+          :headers="tableHeaders"
+          :items="getFilteredNodes"
         >
-          <template v-slot:[`item.link`]="{item}">
+          <template v-slot:[`item.actions`]="{item}">
             <tooltip-button :to="item.link" icon="mdi-view-dashboard" small :tooltip="`View ${item.type}`" />
           </template>
           <template v-slot:[`item.icon`]="{item}">
@@ -56,6 +66,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { toggleArrayValue } from '../scripts/aettbok'
 
 import CardTitle from '../components/common/CardTitle.vue'
 import PersonIcon from '../components/persons/PersonIcon.vue'
@@ -81,7 +92,23 @@ export default {
     selectedTags: new Array(),
 
     filterState: false,
+    filterHasName: '',
     filterTypes: ['Documents', 'Events', 'Locations', 'Persons', 'Sources'], 
+
+    filterTypesAllowed: [
+      { type: 'Documents', icon: 'mdi-note' },
+      { type: 'Events', icon: 'mdi-calendar' },
+      { type: 'Locations', icon: 'mdi-map-marker' },
+      { type: 'Persons', icon: 'mdi-account' },
+      { type: 'Sources', icon: 'mdi-book-multiple' },
+    ],
+
+    tableHeaders: [
+      { value: 'icon', text: '', sortable: false, align: 'center' },
+      { value: 'label', text: 'Label', sortable: true },
+      { value: 'details', text: 'Details', sortable: false },
+      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 55 },
+    ],
 
   }),
 
@@ -91,21 +118,6 @@ export default {
       getLocations: 'getLocations',
       getPersons: 'getPersons',
     }),
-
-    getFilterTypesAllowed() { return [
-      { type: 'Documents', icon: 'mdi-note' },
-      { type: 'Events', icon: 'mdi-calendar' },
-      { type: 'Locations', icon: 'mdi-map-marker' },
-      { type: 'Persons', icon: 'mdi-account' },
-      { type: 'Sources', icon: 'mdi-book-multiple' },
-    ]},
-
-    getTableHeaders() { return [
-      { value: 'icon', text: '', sortable: false, align: 'center' },
-      { value: 'label', text: 'Label', sortable: true },
-      { value: 'details', text: 'Details', sortable: false },
-      { value: 'link', text: 'Link', sortable: false, align: 'center' },
-    ]},
 
     getTaggedLocations() {
 
@@ -143,6 +155,14 @@ export default {
 
     },
 
+    getFilteredNodes() {
+
+      return this.getTaggedNodes.filter(e => !this.filterHasName || ((e.label || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.details || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
+
+    },
+
+    filterSubtitleText()   { return `showing ${this.getFilteredNodes.length} out of ${this.getTaggedNodes.length} entries` }
+
   },
 
   methods: {
@@ -151,19 +171,16 @@ export default {
 
     isTypeSelected(type) { return this.filterTypes.includes(type) },
 
-    toggleTag(id) {
-      if (this.selectedTags.includes(id)) { return this.selectedTags = this.selectedTags.filter(e => e !== id) }
-      return this.selectedTags.push(id)
-    },
-
-    toggleFilterType(type) {
-      if (this.isTypeSelected(type)) { return this.filterTypes = this.filterTypes.filter(e => e !== type) }
-      return this.filterTypes.push(type)
-    },
+    toggleTag(id) { return toggleArrayValue(id, this.selectedTags) },
+    toggleFilterType(type) { return toggleArrayValue(type, this.filterTypes) },
 
     toggleFilter() {
-      this.filterTypes = this.getFilterTypesAllowed.map(e => e.type)
+
+      this.filterHasName = ''
+      this.filterTypes = this.filterTypesAllowed.map(e => e.type)
+
       return this.filterState = !this.filterState
+
     },
 
   }

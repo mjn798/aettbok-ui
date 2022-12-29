@@ -39,7 +39,7 @@ export default {
 
   props: {
       filterIconState: { type: Boolean, default: null },
-      titletype: { type: String, default: null }
+      titletype: { type: String, default: null },
   },
 
   computed: {

@@ -5,6 +5,19 @@ import * as data from './aettbokdata'
 
 
 
+/* GENERIC FUNCTION */
+
+// toggle value inside an array (add if absent, remove if present)
+
+export function toggleArrayValue(value, array) {
+
+    let index = array.findIndex(e => e === value)
+    return index === -1 ? array.push(value) : array.splice(index, 1)
+
+}
+
+
+
 /* DATA LOADING AND PROCESSING */
 
 

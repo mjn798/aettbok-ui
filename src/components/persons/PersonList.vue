@@ -1,6 +1,7 @@
 <template>
     <v-card>
         <person-editor :id="editingItemId" @close="upsertItem(undefined)" />
+        <document-viewer-dialog :id="documentViewing" @close="viewDocument(undefined)" label="Person" />
         <card-title
             :filterIconState="filterState"
             @click="upsertItem(null)"
@@ -10,36 +11,30 @@
         <v-card-text>
             <v-expand-transition>
                 <v-card v-if="filterState">
-                    <v-container fluid>
-                        <v-row align="center" no-gutters>
-                            <v-col>
-                                <tooltip-button :color="filterIsGenderColor" :icon="filterIsGenderIcon" :tooltip="filterIsGenderText" @click="toggleFilterIsGender" />
-                                <tooltip-button :color="filterIsAliveColor" :icon="filterIsAliveIcon" :tooltip="filterIsAliveText" @click="toggleFilterIsAlive" />
-                                <tooltip-button :color="filterIsMarriedColor" :icon="filterIsMarriedIcon" :tooltip="filterIsMarriedText" @click="toggleFilterIsMarried" />
-                            </v-col>
-                            <v-col>
-                                <v-text-field
-                                    class="ma-2"
-                                    clearable
-                                    dense
-                                    hide-details
-                                    outlined
-                                    prepend-inner-icon="mdi-magnify"
-                                    v-model="filterHasName"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <v-card-title>
+                        <tooltip-button :color="filterIsGenderColor" :icon="filterIsGenderIcon" :tooltip="filterIsGenderText" @click="toggleFilterIsGender" />
+                        <tooltip-button :color="filterIsAliveColor" :icon="filterIsAliveIcon" :tooltip="filterIsAliveText" @click="toggleFilterIsAlive" />
+                        <tooltip-button :color="filterIsMarriedColor" :icon="filterIsMarriedIcon" :tooltip="filterIsMarriedText" @click="toggleFilterIsMarried" />
+                        <v-spacer/>
+                        <v-text-field
+                            class="ma-2"
+                            clearable
+                            dense
+                            hide-details
+                            label="Search"
+                            outlined
+                            prepend-inner-icon="mdi-magnify"
+                            v-model="filterHasName"
+                        />
+                    </v-card-title>
                     <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
                 </v-card>
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
             <v-data-table
-                :headers="getTableHeaders"
+                :headers="tableHeaders"
                 :items="getFilteredPersons"
-                disable-pagination
-                hide-default-footer
             >
                 <template v-slot:[`item.actions`]="{item}">
                     <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Person" />
@@ -50,10 +45,12 @@
                     <v-icon color="grey lighten-1" small v-if="item.marriages">mdi-set-none</v-icon>
                 </template>
                 <template v-slot:[`item.numberOfDocuments`]="{item}">
-                    <tooltip-button :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" small />
+                    <tooltip-button :disabled="!item.numberOfDocuments" :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" @click="viewDocument(item.id)" small />
                 </template>
                 <template v-slot:[`item.birth`]="{item}">{{ item.birthLong }}</template>
+                <template v-slot:[`item.birthLocationString`]="{item}"><location-chip :id="item.birthLocation" v-if="item.birthLocation" /></template>
                 <template v-slot:[`item.death`]="{item}">{{ item.deathLong }}</template>
+                <template v-slot:[`item.deathLocationString`]="{item}"><location-chip :id="item.deathLocation" v-if="item.deathLocation" /></template>
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -63,6 +60,8 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../common/CardTitle.vue'
+import DocumentViewerDialog from '../documents/DocumentViewerDialog.vue'
+import LocationChip from '../locations/LocationChip.vue'
 import PersonEditor from './PersonEditor.vue'
 import PersonIcon from './PersonIcon.vue'
 import TooltipButton from '../common/TooltipButton.vue'
@@ -73,6 +72,8 @@ export default {
 
   components: {
       'card-title': CardTitle,
+      'document-viewer-dialog': DocumentViewerDialog,
+      'location-chip': LocationChip,
       'person-editor': PersonEditor,
       'person-icon': PersonIcon,
       'tooltip-button': TooltipButton,
@@ -80,13 +81,26 @@ export default {
 
   data: () => ({
 
+    documentViewing: undefined,
     editingItemId: undefined,
-    filterState: false,
 
+    filterState: false,
     filterHasName: '',
     filterIsAlive: -1,
     filterIsGender: -1,
     filterIsMarried: -1,
+
+    tableHeaders: [
+        { value: 'numberOfDocuments', text: '', sortable: true, width: 45 },
+        { value: 'icon', text: '', sortable: false, width: 90 },
+        { value: 'lastname', text: 'Last Name', sortable: true },
+        { value: 'firstname', text: 'First Name', sortable: true },
+        { value: 'birth', text: 'Birth', sortable: true },
+        { value: 'birthLocationString', text: 'Birth', sortable: true },
+        { value: 'death', text: 'Death', sortable: true },
+        { value: 'deathLocationString', text: 'Death', sortable: true },
+        { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 110 },
+    ],
 
   }),
 
@@ -96,18 +110,6 @@ export default {
         getPersons: 'getPersons',
     }),
 
-    getTableHeaders() { return [
-        { value: 'numberOfDocuments', text: '', sortable: true, width: 45 },
-        { value: 'icon', text: '', sortable: false, width: 90 },
-        { value: 'lastname', text: 'Last Name', sortable: true },
-        { value: 'firstname', text: 'First Name', sortable: true },
-        { value: 'birth', text: 'Birth', sortable: true },
-        { value: 'birthLocationString', text: 'Birth', sortable: true },
-        { value: 'death', text: 'Death', sortable: true },
-        { value: 'deathLocationString', text: 'Death', sortable: true },
-        { value: 'actions', text: 'Actions', sortable: false, width: 110 },
-    ]},
-
     getFilteredPersons() {
 
         if (!this.filterState) { return this.getPersons }
@@ -116,7 +118,7 @@ export default {
                 .filter(e => this.filterIsAlive === -1 || (!!this.filterIsAlive === e.alive))
                 .filter(e => this.filterIsGender === -1 || (this.filterIsGender && e.gender === 'm') || (!this.filterIsGender && e.gender === 'f'))
                 .filter(e => this.filterIsMarried === -1 || (!!this.filterIsMarried === !!e.marriages))
-                .filter(e => !this.filterHasName || (e.firstname && e.firstname.toLowerCase().includes(this.filterHasName.toLowerCase())) || (e.lastname && e.lastname.toLowerCase().includes(this.filterHasName.toLowerCase())))
+                .filter(e => !this.filterHasName || ((e.firstname || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.lastname || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
 
     },
 
@@ -137,6 +139,7 @@ export default {
   methods: {
 
     upsertItem(id) { return this.editingItemId = id },
+    viewDocument(id) { return this.documentViewing = id },
 
     toggleFilterIsAlive()   { return this.filterIsAlive = this.filterIsAlive === 1 ? -1 : this.filterIsAlive + 1 },
     toggleFilterIsGender()  { return this.filterIsGender = this.filterIsGender === 1 ? -1 : this.filterIsGender + 1 },

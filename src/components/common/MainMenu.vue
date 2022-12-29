@@ -48,6 +48,7 @@ export default {
       { text: 'Events',    route: '/events' },
       { text: 'Locations', route: '/locations' },
       { text: 'Persons',   route: '/persons' },
+      { text: 'Sources',   route: '/sources' },
       { text: 'Tags',      route: '/tags' },
     ],
 

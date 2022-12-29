@@ -10,13 +10,13 @@
                         <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Month" outlined type="number" v-model="item.month" /></v-col>
                         <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Year" outlined type="number" v-model="item.year" /></v-col>
                         <v-col cols="12"><location-picker :selected="item.wasin" @selectedItem="selectedLocation" label="Location" /></v-col>
-                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
                         <v-col cols="12"><person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" /></v-col>
+                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
                         <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" /></v-col>
                     </v-row>
                 </v-container>
             </v-card-text>
-            <card-actions :allowRemove="isEditDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
+            <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
     </v-dialog>
 </template>
@@ -60,20 +60,22 @@ export default {
         }),
 
         getEventTypes() { return [
+            { value: 'BAPTISM', text: 'Baptism' },
             { value: 'BIRTH', text: 'Birth' },
-            { value: 'MARRIAGE', text: 'Marriage' },
             { value: 'DEATH', text: 'Death' },
+            { value: 'DIVORCE', text: 'Divorce' },
+            { value: 'MARRIAGE', text: 'Marriage' },
             { value: 'MILITARY', text: 'Military' },
+            { value: 'OCCUPATION', text: 'Occupation' },
             { value: 'RESIDENCE', text: 'Residence' },
-            { value: 'WORK', text: 'Work' },
         ].sort((a, b) => a.text.localeCompare(b.text))},
 
-        getDialogTitle() { return (this.isEditDialog ? 'Edit ' : 'New ') + 'Event' },
+        showDialog() { return this.id !== undefined },
 
-        isEditDialog() { return !([null, undefined].includes(this.id)) },
+        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Event' },
+
+        isNewDialog() { return !this.id },
         isSaveDisabled() { return !(this.item && this.item.type) },
-
-        showDialog() { return this.id !== undefined }
 
     },
 
@@ -114,13 +116,13 @@ export default {
     selectedLocation(id) { return this.item.wasin = id },
 
     linkedDocument(id) {
-        let index = this.item.documentedby.findIndex(e => e === id)
-        return index === -1 ? this.item.documentedby.push(id) : null
+        if (this.item.documentedby.includes(id)) { return }
+        return this.item.documentedby.push(id)
     },
 
     linkedPerson(id) {
-        let index = this.item.attended.findIndex(e => e === id)
-        return index === -1 ? this.item.attended.push(id) : null
+        if (this.item.attended.includes(id)) { return }
+        return this.item.attended.push(id)
     },
 
     unlinkedDocument(id) {
@@ -139,25 +141,22 @@ export default {
 
     id: function(id) {
 
-        if (id === undefined || id === null) {
+        if (id) { return this.item = JSON.parse(JSON.stringify(this.getEvent(id))) }
 
-            let attended = this.$route.name === 'Persons' ? [this.$route.params.id] : []
-            
-            return this.item = {
-                attended: attended,
-                comment: null,
-                documentedby: [],
-                tags: [],
-                day: null,
-                id: null,
-                month: null,
-                type: null,
-                wasin: null,
-                year: null,
-            }
+        let attended = this.$route.name === 'Persons' ? [this.$route.params.id] : []
+        
+        return this.item = {
+            attended: attended,
+            comment: null,
+            documentedby: [],
+            tags: [],
+            day: null,
+            id: null,
+            month: null,
+            type: null,
+            wasin: null,
+            year: null,
         }
-
-        return this.item = { ...this.getEvent(id) }
 
     }
 

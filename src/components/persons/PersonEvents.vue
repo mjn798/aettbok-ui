@@ -1,52 +1,39 @@
 <template>
     <v-card>
         <event-editor :id="editingItemId" @close="upsertItem(undefined)" />
-        <document-editor :id="viewingDocument" @close="viewDocument(undefined)" />
         <card-title
             @click="upsertItem(null)"
             titletype="event"
         />
-        <v-timeline dense class="mx-4">
-            <v-timeline-item
-                :icon="getIcon(event.type)"
-                :key="event.id"
-                color="grey"
-                fill-dot
-                small
-                v-for="event in getEventsForPerson(selectedPerson.id)"
-            >
-                <v-card>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-subtitle>{{ event.dateFull || '' }} {{ event.wasinString ? `in ${event.wasinString}` : '' }}</v-list-item-subtitle>
-                            <v-list-item-subtitle v-if="event.comment">{{ event.comment }}</v-list-item-subtitle>
-                            <v-list-item-subtitle v-if="event.documentedby.length">
-                                <v-chip-group column class="ma-2">
-                                    <v-chip
-                                        :key="id"
-                                        @click="viewDocument(id)"
-                                        label
-                                        outlined
-                                        v-for="id in event.documentedby"
-                                    >
-                                        {{ getDocumentLabel(id) }}
-                                    </v-chip>
-                                </v-chip-group>
-                            </v-list-item-subtitle>
-                            <v-list-item-subtitle
-                                :key="attendee"
-                                v-for="attendee in getOtherAttendees(event)"
-                            >
-                                <person-quickcard class="mt-4" :id="attendee" />
-                            </v-list-item-subtitle>
-                        </v-list-item-content>
-                        <v-list-item-action>
-                            <tooltip-button @click="upsertItem(event.id)" icon="mdi-pencil" tooltip="Edit Event" small />
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-card>
-            </v-timeline-item>
-        </v-timeline>
+        <v-card-text
+            :key="event.id"
+            v-for="event in getEventsForPerson(selectedPerson.id)"
+        >
+            <v-card>
+                <v-list-item>
+                    <v-list-item-icon>
+                        <tooltip-button
+                            :icon="getIcon(event.type)"
+                            :tooltip="getTooltip(event.type)"
+                            disabled
+                        />
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-subtitle class="ma-2">{{ event.dateFull || '' }} {{ event.wasinString ? `in ${event.wasinString}` : '' }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="ma-2" v-if="event.comment">{{ event.comment }}</v-list-item-subtitle>
+                        <v-list-item-subtitle v-if="getOtherAttendees(event).length">
+                            <v-chip-group column>
+                                <person-chip :id="attendee" :key="attendee" islink longdate v-for="attendee in getOtherAttendees(event)" />
+                            </v-chip-group>
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle v-if="event.documentedby.length">
+                            <document-viewer-list :listofids="event.documentedby" />
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                    <v-list-item-action class="text-right align-self-start"><tooltip-button @click="upsertItem(event.id)" icon="mdi-pencil" tooltip="Edit Event" small /></v-list-item-action>
+                </v-list-item>
+            </v-card>
+        </v-card-text>
     </v-card>
 </template>
 
@@ -54,8 +41,9 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../common/CardTitle.vue'
-import DocumentEditor from '../documents/DocumentEditor.vue'
+import DocumentViewerList from '../documents/DocumentViewerList.vue'
 import EventEditor from '../events/EventEditor.vue'
+import PersonChip from './PersonChip.vue'
 import PersonQuickCard from './PersonQuickCard.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
@@ -65,8 +53,9 @@ export default {
 
     components: {
         'card-title': CardTitle,
-        'document-editor': DocumentEditor,
+        'document-viewer-list': DocumentViewerList,
         'event-editor': EventEditor,
+        'person-chip': PersonChip,
         'person-quickcard': PersonQuickCard,
         'tooltip-button': TooltipButton,
     },
@@ -75,6 +64,17 @@ export default {
 
         editingItemId: undefined,
         viewingDocument: undefined,
+
+        eventTypes: [
+            { value: 'BAPTISM', text: 'Baptism', icon: 'mdi-tilde' },
+            { value: 'BIRTH', text: 'Birth', icon: 'mdi-asterisk' },
+            { value: 'DEATH', text: 'Death', icon: 'mdi-cross' },
+            { value: 'DIVORCE', text: 'Divorce',  icon: 'mdi-diameter-variant' },
+            { value: 'MARRIAGE', text: 'Marriage', icon: 'mdi-set-none' },
+            { value: 'MILITARY', text: 'Military', icon: 'mdi-sword-cross' },
+            { value: 'OCCUPATION', text: 'Occupation', icon: 'mdi-hammer-wrench' },
+            { value: 'RESIDENCE', text: 'Residence', icon: 'mdi-home' },
+        ].sort((a, b) => a.text.localeCompare(b.text))
 
     }),
 
@@ -103,17 +103,8 @@ export default {
             return document.tagLabel ? document.tagLabel : null
         },
 
-        getIcon(event) {
-            switch(event) {
-                case 'BIRTH': return 'mdi-star'
-                case 'DEATH': return 'mdi-cross'
-                case 'MARRIAGE': return 'mdi-set-none'
-                case 'MILITARY': return 'mdi-bow-arrow'
-                case 'RESIDENCE': return 'mdi-home'
-                case 'WORK': return 'mdi-hammer-wrench'
-                default: return 'mdi-alert-decagram'
-            }
-        }
+        getIcon(type) { return (this.eventTypes.find(e => e.value === type) || { icon : 'mdi-alert-decegram' }).icon },
+        getTooltip(type) { return (this.eventTypes.find(e => e.value === type) || { text : 'n/a' }).text },
 
     },
 

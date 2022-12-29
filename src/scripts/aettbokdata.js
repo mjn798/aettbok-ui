@@ -150,8 +150,6 @@ export function processDocuments() {
         let source = store.getters.getSource(document.sourcedby)
         if (source) { document.sourcedbyString = source.source }
 
-        document.tagLabel = `${document.sourcedbyString || ''} - ${document.index || ''}`.trim()
-
         // resolve date
 
         if (document.date) {
@@ -203,6 +201,8 @@ export function processEvents() {
         // resolve attendees
 
         if (event.attended.length) {
+
+            event.attended = event.attended.sort((a, b) => (store.getters.getPerson(b) || { gender: 'u'}).gender.localeCompare((store.getters.getPerson(a) || { gender: 'u' }).gender) )
 
             // fullname needs to be resolved here directly, as the person might not be processed yet
 
@@ -339,6 +339,7 @@ export function processSources() {
         // relations
 
         source.containedin = extractRelationSingle(source.relations, 'Source', 'to')
+        source.documents   = extractRelations(source.relations, 'Document', 'from')
         source.storedin    = extractRelationSingle(source.relations, 'Location', 'to')
         source.tags        = extractRelations(source.relations, 'Tag', 'to')
 

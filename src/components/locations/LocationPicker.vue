@@ -16,7 +16,7 @@
         >
             <template v-slot:[`item`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
             <template v-slot:[`selection`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
-            <template v-slot:append-outer><div class="mt-n2"><tooltip-button icon="mdi-map-marker-plus" tooltip="New Location" @click="upsertItem(null)" /></div></template>
+            <template v-slot:append-outer><div class="mt-n3"><tooltip-button icon="mdi-map-marker-plus" tooltip="New Location" @click="upsertItem(null)" /></div></template>
         </v-autocomplete>
     </div>
 </template>
