@@ -1,9 +1,9 @@
 <template>
   <v-card-actions>
-    <tooltip-button @click="remove" icon="mdi-delete" tooltip="Delete" v-if="allowRemove" />
+    <tooltip-button @click="remove" buttontype="action-delete" v-if="allowRemove" />
     <v-spacer />
-    <tooltip-button @click="close" icon="mdi-close" tooltip="Close" />
-    <tooltip-button :disabled="isSaveDisabled" @click="save" color="green" icon="mdi-check" tooltip="Save" v-if="!hideSave" />
+    <tooltip-button @click="close" buttontype="action-ko" />
+    <tooltip-button :disabled="isSaveDisabled" @click="save" buttontype="action-ok" v-if="!hideSave" />
   </v-card-actions>
 </template>
 

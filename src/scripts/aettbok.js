@@ -7,6 +7,10 @@ import * as data from './aettbokdata'
 
 /* GENERIC FUNCTION */
 
+// compare two values
+
+export function compareStrings(a, b) { return (a || '').toLocaleLowerCase().localeCompare((b || '').toLocaleLowerCase()) }
+
 // toggle value inside an array (add if absent, remove if present)
 
 export function toggleArrayValue(value, array) {

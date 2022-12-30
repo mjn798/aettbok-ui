@@ -1,16 +1,14 @@
 <template>
   <v-card-title>
     <tooltip-button
-      :icon="getFilterIcon"
-      :tooltip="getFilterTooltip"
+      :buttontype="getFilterButton"
       @click="clickedFilter"
       v-if="filterIconState !== null"
     />
-    {{ getTitletype.title }}
+    {{ getTitletype }}
     <v-spacer />
     <tooltip-button
-      :icon="getTitletype.icon"
-      :tooltip="getTitletype.tooltip"
+      :buttontype="`${titletype}-new`"
       @click="clickedAction"
       v-if="getTitletype"
     />
@@ -21,13 +19,16 @@
 import TooltipButton from './TooltipButton.vue'
 
 const titletypes = new Map()
-titletypes.set('document', { title: 'Documents', icon: 'mdi-note-plus', tooltip: 'New Document' })
-titletypes.set('event', { title: 'Events', icon: 'mdi-calendar-plus', tooltip: 'New Event' })
-titletypes.set('location', { title: 'Locations', icon: 'mdi-map-marker-plus', tooltip: 'New Location' })
-titletypes.set('locationtype', { title: 'Location Types', icon: 'mdi-home-plus', tooltip: 'New Location Type' })
-titletypes.set('person', { title: 'Persons', icon: 'mdi-account-plus', tooltip: 'New Person' })
-titletypes.set('source', { title: 'Sources', icon: 'mdi-book-plus-multiple', tooltip: 'New Source' })
-titletypes.set('tag', { title: 'Tags', icon: 'mdi-tag-plus', tooltip: 'New Tag' })
+
+titletypes.set('default', 'n/a')
+
+titletypes.set('document', 'Documents')
+titletypes.set('event', 'Events')
+titletypes.set('location', 'Locations')
+titletypes.set('locationtype', 'Location Types')
+titletypes.set('person', 'Persons')
+titletypes.set('source', 'Sources')
+titletypes.set('tag', 'Tags')
 
 export default {
 
@@ -39,15 +40,13 @@ export default {
 
   props: {
       filterIconState: { type: Boolean, default: null },
-      titletype: { type: String, default: null },
+      titletype: { type: String, default: 'default' },
   },
 
   computed: {
 
-    getTitletype() { return titletypes.get(this.titletype) || { title: 'n/a' } },
-
-    getFilterIcon() { return this.filterIconState ? 'mdi-filter-variant-remove' : 'mdi-filter-variant' },
-    getFilterTooltip() { return this.filterIconState ? 'Remove Filter' : 'Apply Filter' }
+    getFilterButton() { return this.filterIconState ? 'filter-remove' : 'filter-normal' },
+    getTitletype() { return titletypes.get(this.titletype) || titletypes.get('default') },
 
   },
 

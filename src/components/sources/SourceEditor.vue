@@ -3,15 +3,11 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-container>
-                    <v-row no-gutters>
-                        <v-col cols="12"><v-text-field class="ma-2" dense hide-details label="Source" outlined v-model="item.source" /></v-col>
-                        <v-col cols="12"><source-picker :exclude="item.id" :selected="item.containedin" @selectedItem="selectedContainedIn" label="Contained in" /></v-col>
-                        <v-col cols="12"><location-picker :selected="item.storedin" @selectedItem="selectedLocation" label="Stored in" /></v-col>
-                        <v-col cols="12"><v-text-field class="ma-2" dense hide-details label="Author" outlined v-model="item.author" /></v-col>
-                        <v-col cols="12"><v-text-field class="ma-2" dense hide-details label="Link" outlined v-model="item.link" /></v-col>
-                    </v-row>
-                </v-container>
+                <v-text-field class="ma-2" dense hide-details label="Source" outlined v-model="item.source" />
+                <source-picker class="ma-2" :exclude="item.id" :selected="item.containedin" @selectedItem="selectedContainedIn" label="Contained in" />
+                <location-picker class="ma-2" :selected="item.storedin" @selectedItem="selectedLocation" label="Stored in" />
+                <v-text-field class="ma-2" dense hide-details label="Author" outlined v-model="item.author" />
+                <v-text-field class="ma-2" dense hide-details label="Link" outlined v-model="item.link" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>

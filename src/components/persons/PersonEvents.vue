@@ -12,14 +12,13 @@
             <v-card>
                 <v-list-item>
                     <v-list-item-icon>
-                        <tooltip-button
-                            :icon="getIcon(event.type)"
-                            :tooltip="getTooltip(event.type)"
-                            disabled
-                        />
+                        <icon :icontype="`event-${(event.type || '').toLocaleLowerCase()}`" class="ma-2" />
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-subtitle class="ma-2">{{ event.dateFull || '' }} {{ event.wasinString ? `in ${event.wasinString}` : '' }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="ma-2" v-if="event.dateFull || event.wasin">
+                            {{ getDateLocationText(event) }}
+                            <location-chip :id="event.wasin" v-if="event.wasin" />
+                        </v-list-item-subtitle>
                         <v-list-item-subtitle class="ma-2" v-if="event.comment">{{ event.comment }}</v-list-item-subtitle>
                         <v-list-item-subtitle v-if="getOtherAttendees(event).length">
                             <v-chip-group column>
@@ -30,7 +29,7 @@
                             <document-viewer-list :listofids="event.documentedby" />
                         </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action class="text-right align-self-start"><tooltip-button @click="upsertItem(event.id)" icon="mdi-pencil" tooltip="Edit Event" small /></v-list-item-action>
+                    <v-list-item-action class="text-right align-self-start"><tooltip-button @click="upsertItem(event.id)" buttontype="edit" small /></v-list-item-action>
                 </v-list-item>
             </v-card>
         </v-card-text>
@@ -43,8 +42,9 @@ import { mapGetters } from 'vuex'
 import CardTitle from '../common/CardTitle.vue'
 import DocumentViewerList from '../documents/DocumentViewerList.vue'
 import EventEditor from '../events/EventEditor.vue'
+import Icon from '../common/Icon.vue'
+import LocationChip from '../locations/LocationChip.vue'
 import PersonChip from './PersonChip.vue'
-import PersonQuickCard from './PersonQuickCard.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -55,34 +55,21 @@ export default {
         'card-title': CardTitle,
         'document-viewer-list': DocumentViewerList,
         'event-editor': EventEditor,
+        'icon': Icon,
+        'location-chip': LocationChip,
         'person-chip': PersonChip,
-        'person-quickcard': PersonQuickCard,
         'tooltip-button': TooltipButton,
     },
 
     data: () => ({
 
         editingItemId: undefined,
-        viewingDocument: undefined,
-
-        eventTypes: [
-            { value: 'BAPTISM', text: 'Baptism', icon: 'mdi-tilde' },
-            { value: 'BIRTH', text: 'Birth', icon: 'mdi-asterisk' },
-            { value: 'DEATH', text: 'Death', icon: 'mdi-cross' },
-            { value: 'DIVORCE', text: 'Divorce',  icon: 'mdi-diameter-variant' },
-            { value: 'MARRIAGE', text: 'Marriage', icon: 'mdi-set-none' },
-            { value: 'MILITARY', text: 'Military', icon: 'mdi-sword-cross' },
-            { value: 'OCCUPATION', text: 'Occupation', icon: 'mdi-hammer-wrench' },
-            { value: 'RESIDENCE', text: 'Residence', icon: 'mdi-home' },
-        ].sort((a, b) => a.text.localeCompare(b.text))
 
     }),
 
     computed: {
 
         ...mapGetters({
-            getDocument: 'getDocument',
-            getEvent: 'getEvent',
             getEventsForPerson: 'getEventsForPerson',
             getPerson: 'getPerson',
         }),
@@ -94,17 +81,9 @@ export default {
     methods: {
 
         upsertItem(id) { return this.editingItemId = id },
-        viewDocument(id) { return this.viewingDocument = id },
 
         getOtherAttendees(event) { return (event.attended || null).filter(e => e !== this.selectedPerson.id) },
-
-        getDocumentLabel(id) {
-            let document = this.getDocument(id)
-            return document.tagLabel ? document.tagLabel : null
-        },
-
-        getIcon(type) { return (this.eventTypes.find(e => e.value === type) || { icon : 'mdi-alert-decegram' }).icon },
-        getTooltip(type) { return (this.eventTypes.find(e => e.value === type) || { text : 'n/a' }).text },
+        getDateLocationText(event) { return `${event.dateFull || ''}${event.wasin ? ' in ' : ''}`.trim() },
 
     },
 

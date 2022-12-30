@@ -1,34 +1,32 @@
 <template>
     <v-dialog max-width="830" persistent v-model="showDialog">
-        <locationtype-editor :showDialog="showLocationTypeEditor" @close="closeLocationTypeEditor" />
+        <locationtype-editor :showDialog="showLocationTypeEditor" @close="showLocationTypeEditor = false" />
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-container>
-                    <v-row no-gutters>
-                        <v-col cols="12" md="7"><v-text-field class="ma-2" dense hide-details label="Location" outlined v-model="item.location" /></v-col>
-                        <v-col cols="12" md="5">
-                            <v-autocomplete
-                                :items="getLocationTypes"
-                                class="ma-2"
-                                clearable
-                                dense
-                                hide-details
-                                item-text="type"
-                                item-value="id"
-                                label="Type"
-                                outlined
-                                v-model="item.locationtype"
-                            >
-                                <template v-slot:append-outer><div class="mt-n3"><tooltip-button @click="showLocationTypeEditor = true" icon="mdi-home-edit" tooltip="Edit Location Types" /></div></template>
-                            </v-autocomplete>
-                        </v-col>
-                        <v-col cols="12"><location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" label="Part of" /></v-col>
-                        <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" /></v-col>
-                        <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" /></v-col>
-                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
-                    </v-row>
-                </v-container>
+                <v-text-field class="ma-2" dense hide-details label="Location" outlined v-model="item.location" />
+                <v-autocomplete
+                    :items="getLocationTypes"
+                    class="ma-2"
+                    clearable
+                    dense
+                    hide-details
+                    item-text="type"
+                    item-value="id"
+                    label="Type"
+                    outlined
+                    v-model="item.locationtype"
+                >
+                    <template v-slot:append-outer>
+                        <div class="mt-n3">
+                            <tooltip-button @click="showLocationTypeEditor = true" buttontype="locationtypes-edit" />
+                        </div>
+                    </template>
+                </v-autocomplete>
+                <location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" class="ma-2" label="Part of" />
+                <v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" />
+                <v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -116,8 +114,6 @@ export default {
         .finally(() => this.close())
 
     },
-
-    closeLocationTypeEditor() { return this.showLocationTypeEditor = false },
 
     selectedLocation(id) { return this.item.partof = id },
 

@@ -1,7 +1,6 @@
 <template>
     <v-card>
         <person-editor :id="editingItemId" @close="upsertItem(undefined)" />
-        <document-viewer-dialog :id="documentViewing" @close="viewDocument(undefined)" label="Person" />
         <card-title
             :filterIconState="filterState"
             @click="upsertItem(null)"
@@ -12,9 +11,9 @@
             <v-expand-transition>
                 <v-card v-if="filterState">
                     <v-card-title>
-                        <tooltip-button :color="filterIsGenderColor" :icon="filterIsGenderIcon" :tooltip="filterIsGenderText" @click="toggleFilterIsGender" />
-                        <tooltip-button :color="filterIsAliveColor" :icon="filterIsAliveIcon" :tooltip="filterIsAliveText" @click="toggleFilterIsAlive" />
-                        <tooltip-button :color="filterIsMarriedColor" :icon="filterIsMarriedIcon" :tooltip="filterIsMarriedText" @click="toggleFilterIsMarried" />
+                        <tooltip-button :buttontype="getFilterIsGender" @click="toggleFilterIsGender" />
+                        <tooltip-button :buttontype="getFilterIsAlive" @click="toggleFilterIsAlive" />
+                        <tooltip-button :buttontype="getFilterIsMarried" @click="toggleFilterIsMarried" />
                         <v-spacer/>
                         <v-text-field
                             class="ma-2"
@@ -32,24 +31,19 @@
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
-            <v-data-table
-                :headers="tableHeaders"
-                :items="getFilteredPersons"
-            >
+            <v-data-table :headers="tableHeaders" :items="getFilteredItems">
                 <template v-slot:[`item.actions`]="{item}">
-                    <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Person" />
-                    <tooltip-button :to="`/persons/${item.id}`" icon="mdi-view-dashboard" small tooltip="View Person" />
+                    <tooltip-button @click="upsertItem(item.id)" buttontype="edit" small />
+                    <tooltip-button :to="`/persons/${item.id}`" buttontype="show-details" small />
                 </template>
                 <template v-slot:[`item.icon`]="{item}">
-                    <person-icon :alive="item.alive" :color="item.iconColor" :icon="item.icon" />
-                    <v-icon color="grey lighten-1" small v-if="item.marriages">mdi-set-none</v-icon>
+                    <icon :icontype="getPersonIcon(item)" />
+                    <icon icontype="marriage" small v-if="item.marriages" />
                 </template>
-                <template v-slot:[`item.numberOfDocuments`]="{item}">
-                    <tooltip-button :disabled="!item.numberOfDocuments" :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" @click="viewDocument(item.id)" small />
-                </template>
+                <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
                 <template v-slot:[`item.birth`]="{item}">{{ item.birthLong }}</template>
-                <template v-slot:[`item.birthLocationString`]="{item}"><location-chip :id="item.birthLocation" v-if="item.birthLocation" /></template>
                 <template v-slot:[`item.death`]="{item}">{{ item.deathLong }}</template>
+                <template v-slot:[`item.birthLocationString`]="{item}"><location-chip :id="item.birthLocation" v-if="item.birthLocation" /></template>
                 <template v-slot:[`item.deathLocationString`]="{item}"><location-chip :id="item.deathLocation" v-if="item.deathLocation" /></template>
             </v-data-table>
         </v-card-text>
@@ -60,10 +54,10 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../common/CardTitle.vue'
-import DocumentViewerDialog from '../documents/DocumentViewerDialog.vue'
+import DocumentViewer from '../documents/DocumentViewer.vue'
+import Icon from '../common/Icon.vue'
 import LocationChip from '../locations/LocationChip.vue'
 import PersonEditor from './PersonEditor.vue'
-import PersonIcon from './PersonIcon.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -72,16 +66,15 @@ export default {
 
   components: {
       'card-title': CardTitle,
-      'document-viewer-dialog': DocumentViewerDialog,
+      'document-viewer': DocumentViewer,
+      'icon': Icon,
       'location-chip': LocationChip,
       'person-editor': PersonEditor,
-      'person-icon': PersonIcon,
       'tooltip-button': TooltipButton,
   },
 
   data: () => ({
 
-    documentViewing: undefined,
     editingItemId: undefined,
 
     filterState: false,
@@ -91,7 +84,7 @@ export default {
     filterIsMarried: -1,
 
     tableHeaders: [
-        { value: 'numberOfDocuments', text: '', sortable: true, width: 45 },
+        { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
         { value: 'icon', text: '', sortable: false, width: 90 },
         { value: 'lastname', text: 'Last Name', sortable: true },
         { value: 'firstname', text: 'First Name', sortable: true },
@@ -110,7 +103,7 @@ export default {
         getPersons: 'getPersons',
     }),
 
-    getFilteredPersons() {
+    getFilteredItems() {
 
         if (!this.filterState) { return this.getPersons }
 
@@ -122,24 +115,19 @@ export default {
 
     },
 
-    filterIsAliveColor()   { return this.filterIsAlive === -1 ? 'grey lighten-1' : this.filterIsAlive === 0 ? 'grey lighten-2' : 'grey' },
-    filterIsAliveIcon()    { return this.filterIsAlive === -1 ? 'mdi-circle-opacity' : this.filterIsAlive === 0 ? 'mdi-circle-outline' : 'mdi-circle' },
-    filterIsAliveText()    { return this.filterIsAlive === -1 ? 'Showing all' : this.filterIsAlive === 0 ? 'Showing dead only' : 'Showing alive only' },
-    filterIsGenderColor()  { return this.filterIsGender === -1 ? 'grey lighten-1' : this.filterIsGender === 0 ? 'pink darken-2' : 'blue darken-2' },
-    filterIsGenderIcon()   { return this.filterIsGender === -1 ? 'mdi-human-male-female' : this.filterIsGender === 0 ? 'mdi-human-female' : 'mdi-human-male' },
-    filterIsGenderText()   { return this.filterIsGender === -1 ? 'Showing all' : this.filterIsGender === 0 ? 'Showing female only' : 'Showing male only' },
-    filterIsMarriedColor() { return this.filterIsMarried === -1 ? 'grey lighten-1' : this.filterIsMarried === 0 ? 'grey lighten-2' : 'grey' },
-    filterIsMarriedIcon()  { return this.filterIsMarried === -1 ? 'mdi-circle-double' : this.filterIsMarried === 0 ? 'mdi-circle-outline' : 'mdi-set-none' },
-    filterIsMarriedText()  { return this.filterIsMarried === -1 ? 'Showing all' : this.filterIsMarried === 0 ? 'Showing unmarried only' : 'Showing married only' },
+    getFilterIsAlive() { return this.filterIsAlive === -1 ? 'showing-status-u' : this.filterIsAlive === 1 ? 'showing-status-a' : 'showing-status-d' },
+    getFilterIsGender() { return this.filterIsGender === -1 ? 'showing-persons-u' : this.filterIsGender === 1 ? 'showing-persons-m' : 'showing-persons-f' },
+    getFilterIsMarried() { return this.filterIsMarried === -1 ? 'showing-married-u' : this.filterIsMarried === 1 ? 'showing-married-t' : 'showing-married-f' },
 
-    filterSubtitleText()   { return `showing ${this.getFilteredPersons.length} out of ${this.getPersons.length} entries` }
+    filterSubtitleText()   { return `showing ${this.getFilteredItems.length} out of ${this.getPersons.length} entries` }
 
   },
 
   methods: {
 
     upsertItem(id) { return this.editingItemId = id },
-    viewDocument(id) { return this.documentViewing = id },
+
+    getPersonIcon(person) { return `person-${person.gender || 'u'}${person.alive ? 'a' : 'd'}` },
 
     toggleFilterIsAlive()   { return this.filterIsAlive = this.filterIsAlive === 1 ? -1 : this.filterIsAlive + 1 },
     toggleFilterIsGender()  { return this.filterIsGender = this.filterIsGender === 1 ? -1 : this.filterIsGender + 1 },

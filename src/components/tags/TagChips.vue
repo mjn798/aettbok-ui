@@ -1,14 +1,14 @@
 <template>
     <div>
         <tag-chip
-            :active="selected.includes(data.id)"
+            :active="selected.includes(item.id)"
             :allowEdit="allowEdit && allowToggle"
-            :data="data"
+            :data="item"
             :disabled="!allowToggle"
-            :key="data.id"
+            :key="item.id"
             @clickEdit="clickEdit"
             @toggle="toggle"
-            v-for="data in getFilteredTags"
+            v-for="item in getFilteredItems"
         />
     </div>
 </template>
@@ -39,7 +39,7 @@ export default {
           getTags: 'getTags',
       }),
 
-      getFilteredTags() { return this.showSelectedOnly && !this.inEditMode ? this.getTags.filter(e => this.selected.includes(e.id)) : this.getTags },
+      getFilteredItems() { return this.showSelectedOnly ? this.getTags.filter(e => this.selected.includes(e.id)) : this.getTags },
 
   },
 

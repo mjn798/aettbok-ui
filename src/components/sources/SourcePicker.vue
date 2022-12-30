@@ -6,15 +6,14 @@
             :label="label"
             :value="selected"
             @change="selectItem"
-            class="ma-2"
             clearable
             dense
             hide-details
             outlined
         >
             <template v-slot:append-outer>
-                <div class="mt-n2">
-                    <tooltip-button icon="mdi-book-plus-multiple" tooltip="New Source" @click="upsertItem(null)" />
+                <div class="mt-n3">
+                    <tooltip-button @click="upsertItem(null)" buttontype="source-new" />
                 </div>
             </template>
         </v-autocomplete>
@@ -51,7 +50,7 @@ export default {
             getSources: 'getSources',
         }),
 
-        getItems() { return this.getSources.map(e => { return { text: e.source, value: e.id } }) },
+        getItems() { return this.getSources.filter(e => e.id !== this.exclude).map(e => { return { text: e.source, value: e.id } }) },
 
     },
 

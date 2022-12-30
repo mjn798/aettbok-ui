@@ -28,11 +28,9 @@
         </v-expand-transition>
       </v-card-text>
       <v-card-text>
-        <v-data-table
-          :headers="tableHeaders"
-          :items="getFilteredSources"
-        >
-          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Source" /></template>
+        <v-data-table :headers="tableHeaders" :items="getFilteredItems">
+          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
+          <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documents" v-if="item.documents.length" /></template>
           <template v-slot:[`item.storedinString`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
         </v-data-table>
       </v-card-text>
@@ -44,6 +42,7 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../components/common/CardTitle.vue'
+import DocumentViewer from '../components/documents/DocumentViewer.vue'
 import LocationChip from '../components/locations/LocationChip.vue'
 import SourceEditor from '../components/sources/SourceEditor.vue'
 import TooltipButton from '../components/common/TooltipButton.vue'
@@ -54,6 +53,7 @@ export default {
 
   components: {
     'card-title': CardTitle,
+    'document-viewer': DocumentViewer,
     'location-chip': LocationChip,
     'source-editor': SourceEditor,
     'tooltip-button': TooltipButton,
@@ -67,10 +67,11 @@ export default {
     filterHasText: '',
 
     tableHeaders: [
+      { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
       { value: 'source', text: 'Source', sortable: true },
       { value: 'containedin', text: 'Contained in', sortable: true },
       { value: 'storedinString', text: 'Stored in', sortable: true },
-      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 55 },
+      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
     ]
 
   }),
@@ -82,17 +83,15 @@ export default {
       getSources: 'getSources',
     }),
 
-    getFilteredSources() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.storedinString || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
+    getFilteredItems() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.storedinString || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
 
-    filterSubtitleText() { return `showing ${this.getFilteredSources.length} out of ${this.getSources.length} entries` }
+    filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getSources.length} entries` }
 
   },
 
   methods: {
 
     upsertItem(id) { return this.editingItemId = id },
-
-    getLocationName(id) { return (this.getLocation(id) || { location: 'n/a' }).location },
 
     toggleFilter() {
 

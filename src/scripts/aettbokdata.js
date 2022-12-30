@@ -345,6 +345,9 @@ export function processSources() {
 
         // calculated attributes
 
+        source.numberOfDocuments     = source.documents.length
+        source.numberOfDocumentsIcon = `mdi-numeric-${source.numberOfDocuments < 10 ? source.numberOfDocuments : '9-plus'}-box${source.numberOfDocuments === 0 ? '-outline' : '-multiple'}`
+
         let containedin = store.getters.getLocation(source.containedin)
         if (containedin) { source.containedinString = containedin.location }
 

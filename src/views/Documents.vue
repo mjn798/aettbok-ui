@@ -32,7 +32,7 @@
           :headers="tableHeaders"
           :items="getFilteredItems"
         >
-          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Document" /></template>
+          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
           <template v-slot:[`item.date`]="{item}">{{ item.dateLong }}</template>
         </v-data-table>
       </v-card-text>
@@ -68,7 +68,7 @@ export default {
       { value: 'sourcedbyString', text: 'Source', sortable: true },
       { value: 'index', text: 'Document Index', sortable: true },
       { value: 'date', text: 'Date', sortable: true },
-      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 55 },
+      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
     ],
 
   }),

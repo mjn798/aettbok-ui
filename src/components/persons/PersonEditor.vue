@@ -3,33 +3,21 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-container>
-                    <v-row no-gutters>
-                        <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="First Name" outlined v-model="item.firstname" /></v-col>
-                        <v-col cols="12" md="6"><v-text-field class="ma-2" dense hide-details label="Last Name" outlined v-model="item.lastname" /></v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col cols="12" md="6">
-                            <v-radio-group class="mx-4" mandatory row v-model="item.gender">
-                                <v-radio color="blue darken-2" label="Male" value="m" />
-                                <v-radio color="pink darken-2" label="Female" value="f" />
-                                <v-radio color="grey" label="Unknown" value="u" />
-                            </v-radio-group>
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-radio-group class="mx-4" mandatory row v-model="item.alive">
-                                <v-radio color="grey darken-2" label="Living" :value="true" />
-                                <v-radio color="grey lighten-1" label="Deceased" :value="false" />
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row no-gutters>
-                        <v-col cols="12"><person-linker :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" label="Parents" /></v-col>
-                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
-                        <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" /></v-col>
-                        <v-col cols="12"><tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-4" /></v-col>
-                    </v-row>
-                </v-container>
+                <v-text-field class="ma-2" dense hide-details label="First Name" outlined v-model="item.firstname" />
+                <v-text-field class="ma-2" dense hide-details label="Last Name" outlined v-model="item.lastname" />
+                <v-radio-group class="mx-4 mt-4" mandatory row v-model="item.gender">
+                    <v-radio color="blue darken-2" label="Male" value="m" />
+                    <v-radio color="pink darken-2" label="Female" value="f" />
+                    <v-radio color="grey" label="Unknown" value="u" />
+                </v-radio-group>
+                <v-radio-group class="mx-4 mt-n2" mandatory row v-model="item.alive">
+                    <v-radio color="grey darken-2" label="Living" :value="true" />
+                    <v-radio color="grey lighten-1" label="Deceased" :value="false" />
+                </v-radio-group>
+                <v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" />
+                <person-linker :exclude="item.id" :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" class="ma-2" label="Parents" />
+                <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>

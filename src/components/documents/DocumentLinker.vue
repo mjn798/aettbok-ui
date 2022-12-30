@@ -1,37 +1,28 @@
 <template>
     <div>
         <v-autocomplete
-            :filter="filterDocuments"
-            :items="getDocuments"
-            class="mx-2 mt-2 mb-n1"
+            :filter="filterItems"
+            :items="getItems"
             dense
             hide-details
-            item-value="id"
             label="Related Documents"
             outlined
-            v-model="selectedDocument"
+            v-model="selectedItem"
         >
-            <template v-slot:[`item`]="{item}"><small class="mr-2">{{ item.sourcedbyString }}</small>{{ item.index }}</template>
-            <template v-slot:[`selection`]="{item}"><small class="mr-2">{{ item.sourcedbyString }}</small>{{ item.index }}</template>
+            <template v-slot:[`item`]="{item}"><small class="mr-2">{{ item.source }}</small>{{ item.text }}</template>
+            <template v-slot:[`selection`]="{item}"><small class="mr-2">{{ item.source }}</small>{{ item.text }}</template>
             <template v-slot:append-outer>
-                <div class="mt-n2">
-                    <tooltip-button
-                    :disabled="selectedDocument === null"
-                    @click="linkDocument"
-                    icon="mdi-link"
-                    tooltip="Link Document"
-                    />
+                <div class="mt-n3">
+                    <tooltip-button :disabled="selectedItem === null" @click="linkDocument" buttontype="link" />
                 </div>
             </template>
         </v-autocomplete>
-        <div class="mx-1 mb-3">
-            <document-viewer-list
-                :listofids="documents"
-                @closed="unlinkDocument"
-                closeicon="mdi-link-off"
-                v-if="documents.length"
-            />
-        </div>
+        <document-viewer-list
+            :listofids="documents"
+            @closed="unlinkDocument"
+            closeicon="mdi-link-off"
+            v-if="documents.length"
+        />
     </div>
 </template>
 
@@ -43,7 +34,7 @@ import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
 
-    name: 'DocumentEditor',
+    name: 'DocumentLinker',
 
     components: {
         'document-viewer-list': DocumentViewerList,
@@ -55,32 +46,31 @@ export default {
     },
 
     data: () => ({
-
-        selectedDocument: null,
-
+        selectedItem: null,
     }),
 
     computed: {
 
         ...mapGetters({
-            getDocument: 'getDocument',
             getDocuments: 'getDocuments',
         }),
+
+        getItems() { return this.getDocuments.map(e => { return { source: e.sourcedbyString, text: e.index, value: e.id }}) },
 
     },
 
   methods: {
 
-    filterDocuments(item, queryText, itemText) { return (item.sourcedbyString || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) || (item.index || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) },
+    filterItems(item, queryText, itemText) { return (item.source || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) || (itemText || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) },
 
     linkDocument() {
-        this.$emit('linkedDocument', this.selectedDocument)
-        return this.selectedDocument = null
+        this.$emit('linkedDocument', this.selectedItem)
+        return this.selectedItem = null
     },
 
     unlinkDocument(id) {
         this.$emit('unlinkedDocument', id)
-        return this.selectedDocument = null
+        return this.selectedItem = null
     },
 
   },

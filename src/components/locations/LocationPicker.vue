@@ -6,17 +6,18 @@
             :label="label"
             :value="selected"
             @change="selectItem"
-            class="ma-2"
             clearable
             dense
             hide-details
-            item-text="location"
-            item-value="id"
             outlined
         >
-            <template v-slot:[`item`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
-            <template v-slot:[`selection`]="{item}">{{ getLocationLabel(item) }}<small class="ml-2">({{ getLocationType(item) }})</small></template>
-            <template v-slot:append-outer><div class="mt-n3"><tooltip-button icon="mdi-map-marker-plus" tooltip="New Location" @click="upsertItem(null)" /></div></template>
+            <template v-slot:[`item`]="{item}">{{ item.text }}<small class="ml-2">({{ item.type }})</small></template>
+            <template v-slot:[`selection`]="{item}">{{ item.text }}<small class="ml-2">({{ item.type }})</small></template>
+            <template v-slot:append-outer>
+                <div class="mt-n3">
+                    <tooltip-button @click="upsertItem(null)" buttontype="location-new" />
+                </div>
+            </template>
         </v-autocomplete>
     </div>
 </template>
@@ -51,9 +52,7 @@ export default {
             getLocations: 'getLocations',
         }),
 
-        getItems() {
-            return this.getLocations.filter(e => e.id !== this.exclude)
-        },
+        getItems() { return this.getLocations.filter(e => e.id !== this.exclude).map(e => { return { text: e.location, type: (e.locationtypeString || ''), value: e.id } }) },
 
     },
 
@@ -62,9 +61,6 @@ export default {
         upsertItem(id) { return this.editingItemId = id },
 
         selectItem(id) { return this.$emit('selectedItem', id) },
-
-        getLocationLabel(item) { return `${item.location || ''}`.trim() },
-        getLocationType(item)  { return `${item.locationtypeString || ''}`.trim() },
 
     },
 

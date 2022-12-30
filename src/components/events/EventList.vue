@@ -1,7 +1,6 @@
 <template>
     <v-card>
         <event-editor :id="editingItemId" @close="upsertItem(undefined)" />
-        <document-viewer-dialog :id="documentViewing" @close="viewDocument(undefined)" label="Event" />
         <card-title
             :filterIconState="filterState"
             @click="upsertItem(null)"
@@ -13,11 +12,9 @@
                 <v-card v-if="filterState">
                     <v-card-title>
                         <tooltip-button
-                            :color="isTypeSelected(type.value) ? 'grey lighten-1' : 'grey lighten-2'"
-                            :icon="type.icon"
-                            :key="type.type"
-                            :tooltip="`${isTypeSelected(type.value) ? 'Showing' : 'Hiding'} ${type.text}`"
-                            @click="toggleFilterType(type.value)"
+                            :buttontype="`${isTypeSelected(type) ? 'showing' : 'hiding'}-${(type || '').toLowerCase()}`"
+                            :key="type"
+                            @click="toggleFilterType(type)"
                             v-for="type in eventTypes"
                         />
                         <v-spacer/>
@@ -39,14 +36,10 @@
         <v-card-text>
             <v-data-table
                 :headers="tableHeaders"
-                :items="getFilteredEvents"
+                :items="getFilteredItems"
             >
-                <template v-slot:[`item.actions`]="{item}">
-                    <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Event" />
-                </template>
-                <template v-slot:[`item.numberOfDocuments`]="{item}">
-                    <tooltip-button :disabled="!item.numberOfDocuments" :icon="item.numberOfDocumentsIcon" :tooltip="`${item.numberOfDocuments} Documents`" @click="viewDocument(item.id)" small />
-                </template>
+                <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
+                <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
                 <template v-slot:[`item.date`]="{item}">{{ item.dateFull }}</template>
                 <template v-slot:[`item.attendedString`]="{item}">
                     <person-chip
@@ -67,7 +60,7 @@ import { mapGetters } from 'vuex'
 import { toggleArrayValue } from '../../scripts/aettbok'
 
 import CardTitle from '../common/CardTitle.vue'
-import DocumentViewerDialog from '../documents/DocumentViewerDialog.vue'
+import DocumentViewer from '../documents/DocumentViewer.vue'
 import EventEditor from './EventEditor.vue'
 import LocationChip from '../locations/LocationChip.vue'
 import PersonChip from '../persons/PersonChip.vue'
@@ -79,7 +72,7 @@ export default {
 
     components: {
         'card-title': CardTitle,
-        'document-viewer-dialog': DocumentViewerDialog,
+        'document-viewer': DocumentViewer,
         'event-editor': EventEditor,
         'location-chip': LocationChip,
         'person-chip': PersonChip,
@@ -92,7 +85,6 @@ export default {
 
     data: () => ({
 
-        documentViewing: undefined,
         editingItemId: undefined,
 
         filterState: false,
@@ -100,24 +92,15 @@ export default {
         filterTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
 
         tableHeaders: [
-            { value: 'numberOfDocuments', text: '', sortable: true, width: 45 },
+            { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
             { value: 'typeString', text: 'Type', sortable: true },
             { value: 'attendedString', text: 'Attendees', sortable: false },
             { value: 'date', text: 'Date', sortable: true },
             { value: 'wasinString', text: 'Location', sortable: true },
-            { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 55 },
+            { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
         ],
 
-        eventTypes: [
-            { value: 'BAPTISM', text: 'Baptism', icon: 'mdi-tilde' },
-            { value: 'BIRTH', text: 'Birth', icon: 'mdi-asterisk' },
-            { value: 'DEATH', text: 'Death', icon: 'mdi-cross' },
-            { value: 'DIVORCE', text: 'Divorce',  icon: 'mdi-diameter-variant' },
-            { value: 'MARRIAGE', text: 'Marriage', icon: 'mdi-set-none' },
-            { value: 'MILITARY', text: 'Military', icon: 'mdi-sword-cross' },
-            { value: 'OCCUPATION', text: 'Occupation', icon: 'mdi-hammer-wrench' },
-            { value: 'RESIDENCE', text: 'Residence', icon: 'mdi-home' },
-        ].sort((a, b) => a.text.localeCompare(b.text))
+        eventTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
 
     }),
 
@@ -127,7 +110,7 @@ export default {
            getEvents: 'getEvents',
         }),
 
-        getFilteredEvents() {
+        getFilteredItems() {
 
             if (!(this.filterState || this.locationFilter)) { return this.getEvents }
 
@@ -138,14 +121,13 @@ export default {
 
         },
 
-        filterSubtitleText() { return `showing ${this.getFilteredEvents.length} out of ${this.getEvents.length} entries` }
+        filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getEvents.length} entries` }
 
     },
 
     methods: {
 
         upsertItem(id) { return this.editingItemId = id },
-        viewDocument(id) { return this.documentViewing = id },
 
         isTypeSelected(type) { return this.filterTypes.includes(type) },
 
@@ -154,11 +136,11 @@ export default {
         toggleFilter() {
 
             this.filterHasName = ''
-            this.filterTypes = this.eventTypes.map(e => e.value)
+            this.filterTypes = this.eventTypes.map(e => e)
 
             return this.filterState = !this.filterState
 
-        }
+        },
 
     },
 

@@ -34,24 +34,17 @@
                             prepend-inner-icon="mdi-magnify"
                             v-model="filterHasName"
                         />
-                        <tooltip-button
-                            :icon="filterPartof ? 'mdi-map-marker-radius' : 'mdi-map-marker'"
-                            :tooltip="filterPartof ? 'Showing Locations and Parts' : 'Showing Locations only'"
-                            @click="filterPartof = !filterPartof"
-                        />
+                        <tooltip-button :buttontype="filterPartof ? 'locations-radius' : 'locations-exact'" @click="filterPartof = !filterPartof" />
                     </v-card-title>
                     <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
                 </v-card>
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
-            <v-data-table
-                :headers="tableHeaders"
-                :items="getFilteredLocations"
-            >
+            <v-data-table :headers="tableHeaders" :items="getFilteredItems">
                 <template v-slot:[`item.actions`]="{item}">
-                    <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Location" />
-                    <tooltip-button :to="`/locations/${item.id}`" icon="mdi-view-dashboard" small tooltip="View Location" />
+                    <tooltip-button @click="upsertItem(item.id)" buttontype="edit" small />
+                    <tooltip-button :to="`/locations/${item.id}`" buttontype="show-details" small />
                 </template>
             </v-data-table>
         </v-card-text>
@@ -100,7 +93,7 @@ export default {
             getLocationTypes: 'getLocationTypes',
         }),
 
-        getFilteredLocations() {
+        getFilteredItems() {
 
             if (!this.filterState) { return this.getLocations }
 
@@ -114,7 +107,7 @@ export default {
 
         },
 
-        filterSubtitleText() { return `showing ${this.getFilteredLocations.length} out of ${this.getLocations.length} entries` }
+        filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getLocations.length} entries` }
 
     },
 

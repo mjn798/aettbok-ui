@@ -2,18 +2,14 @@
     <v-card>
         <location-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <v-card-title>
-            <div>{{ selectedLocation.location }}</div>
+            <div>{{ selectedItem.location }}</div>
             <v-spacer/>
-            <tooltip-button
-                @click="upsertItem($route.params.id)"
-                icon="mdi-map-marker"
-                tooltip="Edit Location"
-            />
+            <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="location-edit" />
         </v-card-title>
         <v-card-text>
-            {{ `${selectedLocation.locationtypeString} ${selectedLocation.partofResolved ? 'in ' + selectedLocation.partofResolved : ''}`.trim() }}
+            {{ `${selectedItem.locationtypeString} ${selectedItem.partofResolved ? 'in ' + selectedItem.partofResolved : ''}`.trim() }}
         </v-card-text>
-        <v-card-text v-if="selectedLocation.tags.length"><tag-chips :selected="selectedLocation.tags" /></v-card-text>
+        <v-card-text v-if="selectedItem.tags.length"><tag-chips :selected="selectedItem.tags" /></v-card-text>
     </v-card>
 </template>
 
@@ -48,7 +44,7 @@ export default {
             getLocation: 'getLocation',
         }),
 
-        selectedLocation() { return this.getLocation(this.$route.params.id) },
+        selectedItem() { return this.getLocation(this.$route.params.id) },
 
     },
 
