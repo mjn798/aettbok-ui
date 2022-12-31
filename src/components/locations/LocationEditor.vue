@@ -24,8 +24,10 @@
                     </template>
                 </v-autocomplete>
                 <location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" class="ma-2" label="Part of" />
-                <v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" />
-                <v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" />
+                <v-row no-gutters>
+                    <v-col cols="12" sm="6"><v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" /></v-col>
+                    <v-col cols="12" sm="6"><v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" /></v-col>
+                </v-row>
                 <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />

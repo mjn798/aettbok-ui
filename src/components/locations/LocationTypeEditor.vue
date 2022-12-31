@@ -1,21 +1,15 @@
 <template>
     <v-dialog max-width="480" persistent v-model="showDialog">
-        <locationtypedetails-editor :id="editingItemId" @close="upsertItem(undefined)" />
+        <locationtypedetail-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <v-card>
             <card-title
                 @click="upsertItem(null)"
                 titletype="locationtype"
             />
             <v-card-text>
-                <v-data-table
-                    :headers="getTableHeaders"
-                    :items="getLocationTypes"
-                    dense
-                    disable-pagination
-                    hide-default-footer
-                >
+                <v-data-table :headers="tableHeaders" :items="getLocationTypes" dense>
                     <template v-slot:[`item.actions`]="{item}">
-                        <tooltip-button @click="upsertItem(item.id)" icon="mdi-pencil" small tooltip="Edit Location Type" />
+                        <tooltip-button @click="upsertItem(item.id)" buttontype="edit" small />
                     </template>
                     <template v-slot:[`item.hierarchy`]="{item}">
                         <v-icon color="grey">mdi-numeric-{{ item.hierarchy }}-box-outline</v-icon>
@@ -32,7 +26,7 @@ import { mapGetters } from 'vuex'
 
 import CardActions from '../common/CardActions.vue'
 import CardTitle from '../common/CardTitle.vue'
-import LocationTypeDetailsEditor from './LocationTypeDetailEditor.vue'
+import LocationTypeDetailEditor from './LocationTypeDetailEditor.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -42,7 +36,7 @@ export default {
     components: {
         'card-actions': CardActions,
         'card-title': CardTitle,
-        'locationtypedetails-editor': LocationTypeDetailsEditor,
+        'locationtypedetail-editor': LocationTypeDetailEditor,
         'tooltip-button': TooltipButton,
     },
 
@@ -54,6 +48,12 @@ export default {
 
         editingItemId: undefined,
 
+        tableHeaders: [
+            { value: 'hierarchy', text: 'Hierarchy', sortable: true, align: 'center' },
+            { value: 'type', text: 'Type', sortable: true },
+            { value: 'actions', text: 'Actions', sortable: false, width: 55, align: 'center' },
+        ],
+
     }),
 
     computed: {
@@ -61,12 +61,6 @@ export default {
         ...mapGetters({
             getLocationTypes: 'getLocationTypes',
         }),
-
-        getTableHeaders() { return [
-            { value: 'hierarchy', text: 'Hierarchy', sortable: true, align: 'center' },
-            { value: 'type', text: 'Type', sortable: true },
-            { value: 'actions', text: 'Actions', sortable: false, width: 110, align: 'center' },
-        ]},
 
     },
 

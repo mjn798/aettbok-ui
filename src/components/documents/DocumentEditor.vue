@@ -3,15 +3,11 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-container>
-                    <v-row no-gutters>
-                        <v-col cols="12"><source-picker :selected="item.sourcedby" @selectedItem="selectedSource" label="Source" /></v-col>
-                        <v-col cols="12"><v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" /></v-col>
-                        <v-col cols="12"><v-text-field class="ma-2" dense hide-details label="Date" outlined v-model="item.date" /></v-col>
-                        <v-col cols="12"><v-textarea class="ma-2" dense height="500" hide-details label="Content" outlined v-model="item.content" /></v-col>
-                        <v-col cols="12"><person-linker :persons="item.persons" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" /></v-col>
-                    </v-row>
-                </v-container>
+                <source-picker :selected="item.sourcedby" @selectedItem="selectedSource" class="ma-2" label="Source" />
+                <v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" />
+                <v-text-field class="ma-2" dense hide-details label="Date" outlined v-model="item.date" />
+                <v-textarea class="ma-2" dense height="500" hide-details label="Content" outlined v-model="item.content" />
+                <person-linker :persons="item.persons" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>

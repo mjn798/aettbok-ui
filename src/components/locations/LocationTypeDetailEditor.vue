@@ -40,7 +40,7 @@ import CardActions from '../common/CardActions.vue'
 
 export default {
 
-  name: 'LocationTypeDetailsEditor',
+  name: 'LocationTypeDetailEditor',
 
   components: {
       'card-actions': CardActions,
@@ -64,7 +64,7 @@ export default {
 
       showDialog() { return this.id !== undefined },
 
-      getDialogTitle() { return (this.isNewDialog ? 'Neu ' : 'Edit ') + 'Location Type'},
+      getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Location Type'},
 
       isNewDialog() { return !this.id },
       isSaveDisabled() { return !(this.item.type && this.item.type.trim()) },

@@ -3,18 +3,16 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-container>
-                    <v-row no-gutters>
-                        <v-col cols="12"><v-autocomplete :items="getEventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" /></v-col>
-                        <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Day" outlined type="number" v-model="item.day" /></v-col>
-                        <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Month" outlined type="number" v-model="item.month" /></v-col>
-                        <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Year" outlined type="number" v-model="item.year" /></v-col>
-                        <v-col cols="12"><location-picker :selected="item.wasin" @selectedItem="selectedLocation" label="Location" /></v-col>
-                        <v-col cols="12"><person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" /></v-col>
-                        <v-col cols="12"><document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" /></v-col>
-                        <v-col cols="12"><v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" /></v-col>
-                    </v-row>
-                </v-container>
+                <v-autocomplete :items="eventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" />
+                <v-row no-gutters>
+                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Day" outlined type="number" v-model="item.day" /></v-col>
+                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Month" outlined type="number" v-model="item.month" /></v-col>
+                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Year" outlined type="number" v-model="item.year" /></v-col>
+                </v-row>
+                <location-picker :selected="item.wasin" @selectedItem="selectedLocation" class="ma-2" label="Location" />
+                <person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
+                <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
+                <v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -49,17 +47,7 @@ export default {
 
         item: { },
 
-        pickedDate: '',
-
-    }),
-
-    computed: {
-
-        ...mapGetters({
-            getEvent: 'getEvent',
-        }),
-
-        getEventTypes() { return [
+        eventTypes: [
             { value: 'BAPTISM', text: 'Baptism' },
             { value: 'BIRTH', text: 'Birth' },
             { value: 'DEATH', text: 'Death' },
@@ -68,7 +56,15 @@ export default {
             { value: 'MILITARY', text: 'Military' },
             { value: 'OCCUPATION', text: 'Occupation' },
             { value: 'RESIDENCE', text: 'Residence' },
-        ].sort((a, b) => a.text.localeCompare(b.text))},
+        ].sort((a, b) => a.text.localeCompare(b.text)),
+
+    }),
+
+    computed: {
+
+        ...mapGetters({
+            getEvent: 'getEvent',
+        }),
 
         showDialog() { return this.id !== undefined },
 
