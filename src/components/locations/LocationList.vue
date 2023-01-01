@@ -41,12 +41,12 @@
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
-            <v-data-table :headers="tableHeaders" :items="getFilteredItems">
-                <template v-slot:[`item.actions`]="{item}">
-                    <tooltip-button @click="upsertItem(item.id)" buttontype="edit" small />
-                    <tooltip-button :to="`/locations/${item.id}`" buttontype="show-details" small />
-                </template>
-            </v-data-table>
+            <data-table
+                :headers="tableHeaders"
+                :items="getFilteredItems"
+                @edit="upsertItem"
+                @view="navigateTo"
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -55,6 +55,7 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../common/CardTitle.vue'
+import DataTable from '../common/DataTable.vue'
 import LocationEditor from './LocationEditor.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
@@ -64,6 +65,7 @@ export default {
 
     components: {
         'card-title': CardTitle,
+        'data-table': DataTable,
         'location-editor': LocationEditor,
         'tooltip-button': TooltipButton,
     },
@@ -77,12 +79,7 @@ export default {
         filterPartof: false,
         filterType: null,
 
-        tableHeaders: [
-            { value: 'locationtypetext', text: 'Type', sortable: true, align: 'end' },
-            { value: 'location', text: 'Location', sortable: true },
-            { value: 'partofresolved', text: 'Part of', sortable: true },
-            { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 110 },
-        ],
+        tableHeaders: ['locationtypetext', 'location', 'partofresolved', 'actionsview'],
 
     }),
 
@@ -114,6 +111,7 @@ export default {
     methods: {
 
         upsertItem(id) { return this.editingItemId = id },
+        navigateTo(id) { return this.$router.push(`/locations/${id}`) },
 
         toggleFilter() {
 

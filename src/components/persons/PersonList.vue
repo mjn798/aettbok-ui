@@ -31,21 +31,12 @@
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
-            <v-data-table :headers="tableHeaders" :items="getFilteredItems">
-                <template v-slot:[`item.actions`]="{item}">
-                    <tooltip-button @click="upsertItem(item.id)" buttontype="edit" small />
-                    <tooltip-button :to="`/persons/${item.id}`" buttontype="show-details" small />
-                </template>
-                <template v-slot:[`item.icon`]="{item}">
-                    <icon :icontype="getPersonIcon(item)" />
-                    <icon icontype="marriage" small v-if="item.marriages" />
-                </template>
-                <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
-                <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
-                <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>
-                <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
-                <template v-slot:[`item.deathlocationtext`]="{item}"><location-chip :id="item.deathlocation" v-if="item.deathlocation" /></template>
-            </v-data-table>
+            <data-table
+                :headers="tableHeaders"
+                :items="getFilteredItems"
+                @edit="upsertItem"
+                @view="navigateTo"
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -54,9 +45,7 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../common/CardTitle.vue'
-import DocumentViewer from '../documents/DocumentViewer.vue'
-import Icon from '../common/Icon.vue'
-import LocationChip from '../locations/LocationChip.vue'
+import DataTable from '../common/DataTable.vue'
 import PersonEditor from './PersonEditor.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
@@ -66,9 +55,7 @@ export default {
 
   components: {
       'card-title': CardTitle,
-      'document-viewer': DocumentViewer,
-      'icon': Icon,
-      'location-chip': LocationChip,
+      'data-table': DataTable,
       'person-editor': PersonEditor,
       'tooltip-button': TooltipButton,
   },
@@ -83,17 +70,7 @@ export default {
     filterIsGender: -1,
     filterIsMarried: -1,
 
-    tableHeaders: [
-        { value: 'documentscount', text: '', sortable: true, width: 50 },
-        { value: 'icon', text: '', sortable: false, width: 90 },
-        { value: 'lastname', text: 'Last Name', sortable: true },
-        { value: 'firstname', text: 'First Name', sortable: true },
-        { value: 'datebirth', text: 'Birth', sortable: true },
-        { value: 'birthlocationtext', text: 'Birth', sortable: true },
-        { value: 'datedeath', text: 'Death', sortable: true },
-        { value: 'deathlocationtext', text: 'Death', sortable: true },
-        { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 110 },
-    ],
+    tableHeaders: ['documentscount', 'personicons', 'lastname', 'firstname', 'datebirth', 'birthlocationtext', 'datedeath', 'deathlocationtext', 'actionsview'],
 
   }),
 
@@ -126,6 +103,7 @@ export default {
   methods: {
 
     upsertItem(id) { return this.editingItemId = id },
+    navigateTo(id) { return this.$router.push(`/persons/${id}`) },
 
     getPersonIcon(person) { return `person-${person.gender || 'u'}${person.alive ? 'a' : 'd'}` },
 

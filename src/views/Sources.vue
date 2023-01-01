@@ -28,11 +28,11 @@
         </v-expand-transition>
       </v-card-text>
       <v-card-text>
-        <v-data-table :headers="tableHeaders" :items="getFilteredItems">
-          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-          <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documents" v-if="item.documents.length" /></template>
-          <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
-        </v-data-table>
+        <data-table
+          :headers="tableHeaders"
+          :items="getFilteredItems"
+          @edit="upsertItem"
+        />
       </v-card-text>
     </v-card>
   </v-col></v-row></v-container>
@@ -42,10 +42,8 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../components/common/CardTitle.vue'
-import DocumentViewer from '../components/documents/DocumentViewer.vue'
-import LocationChip from '../components/locations/LocationChip.vue'
+import DataTable from '../components/common/DataTable.vue'
 import SourceEditor from '../components/sources/SourceEditor.vue'
-import TooltipButton from '../components/common/TooltipButton.vue'
 
 export default {
 
@@ -53,10 +51,8 @@ export default {
 
   components: {
     'card-title': CardTitle,
-    'document-viewer': DocumentViewer,
-    'location-chip': LocationChip,
+    'data-table': DataTable,
     'source-editor': SourceEditor,
-    'tooltip-button': TooltipButton,
   },
 
   data: () => ({
@@ -66,24 +62,17 @@ export default {
     filterState: false,
     filterHasText: '',
 
-    tableHeaders: [
-      { value: 'documentscount', text: '', sortable: true, width: 50 },
-      { value: 'source', text: 'Source', sortable: true },
-      { value: 'containedin', text: 'Contained in', sortable: true },
-      { value: 'storedintext', text: 'Stored in', sortable: true },
-      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
-    ]
+    tableHeaders: ['documentscount', 'source', 'containedintext', 'storedintext', 'actions'],
 
   }),
 
   computed: {
 
     ...mapGetters({
-      getLocation: 'getLocation',
       getSources: 'getSources',
     }),
 
-    getFilteredItems() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.storedintext || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
+    getFilteredItems() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.containedintext || '').toLowerCase().includes(this.filterHasText.toLowerCase()) || (e.storedintext || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
 
     filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getSources.length} entries` }
 

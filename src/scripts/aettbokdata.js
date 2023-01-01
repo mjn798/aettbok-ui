@@ -331,14 +331,14 @@ export function processSources() {
 
         // relations
 
-        source.containedin = extractRelationSingle(source.relations, 'Source', 'to')
-        source.documents   = extractRelations(source.relations, 'Document', 'from')
-        source.storedin    = extractRelationSingle(source.relations, 'Location', 'to')
-        source.tags        = extractRelations(source.relations, 'Tag', 'to')
+        source.containedin  = extractRelationSingle(source.relations, 'Source', 'to')
+        source.documentedby = extractRelations(source.relations, 'Document', 'from')
+        source.storedin     = extractRelationSingle(source.relations, 'Location', 'to')
+        source.tags         = extractRelations(source.relations, 'Tag', 'to')
 
         // calculated attributes
 
-        source.documentscount = source.documents.length
+        source.documentscount = source.documentedby.length
 
         let containedin = store.getters.getLocation(source.containedin)
         if (containedin && containedin.location) { source.containedintext = containedin.location }

@@ -28,13 +28,11 @@
         </v-expand-transition>
       </v-card-text>
       <v-card-text>
-        <v-data-table
+        <data-table
           :headers="tableHeaders"
           :items="getFilteredItems"
-        >
-          <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-          <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
-        </v-data-table>
+          @edit="upsertItem"
+        />
       </v-card-text>
     </v-card>
   </v-col></v-row></v-container>
@@ -44,8 +42,8 @@
 import { mapGetters } from 'vuex'
 
 import CardTitle from '../components/common/CardTitle.vue'
+import DataTable from '../components/common/DataTable.vue'
 import DocumentEditor from '../components/documents/DocumentEditor.vue'
-import TooltipButton from '../components/common/TooltipButton.vue'
 
 export default {
 
@@ -53,8 +51,8 @@ export default {
 
   components: {
     'card-title': CardTitle,
+    'data-table': DataTable,
     'document-editor': DocumentEditor,
-    'tooltip-button': TooltipButton,
   },
 
   data: () => ({
@@ -64,12 +62,7 @@ export default {
     filterState: false,
     filterHasText: '',
 
-    tableHeaders: [
-      { value: 'sourcedbytext', text: 'Source', sortable: true },
-      { value: 'index', text: 'Document Index', sortable: true },
-      { value: 'date', text: 'Date', sortable: true },
-      { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
-    ],
+    tableHeaders: ['sourcedbytext', 'index', 'date', 'actions'],
 
   }),
 

@@ -45,13 +45,10 @@
         />
       </v-card-text>
       <v-card-text>
-        <v-data-table :headers="tableHeaders" :items="getFilteredItems">
-          <template v-slot:[`item.type`]="{item}"><icon :icontype="item.icon" /></template>
-          <template v-slot:[`item.label`]="{item}">
-            <location-chip :id="item.id" v-if="item.id && item.type === 'location'" />
-            <person-chip :id="item.id" islink v-if="item.id && item.type === 'person'" />
-          </template>
-        </v-data-table>
+        <data-table
+          :headers="tableHeaders"
+          :items="getFilteredItems"
+        />
       </v-card-text>
     </v-card>
   </v-col></v-row></v-container>
@@ -62,9 +59,7 @@ import { mapGetters } from 'vuex'
 import { compareStrings, toggleArrayValue } from '../scripts/aettbok'
 
 import CardTitle from '../components/common/CardTitle.vue'
-import Icon from '../components/common/Icon.vue'
-import LocationChip from '../components/locations/LocationChip.vue'
-import PersonChip from '../components/persons/PersonChip.vue'
+import DataTable from '../components/common/DataTable.vue'
 import TagChips from '../components/tags/TagChips.vue'
 import TagEditor from '../components/tags/TagEditor.vue'
 import TooltipButton from '../components/common/TooltipButton.vue'
@@ -75,9 +70,7 @@ export default {
 
   components: {
     'card-title': CardTitle,
-    'icon': Icon,
-    'location-chip': LocationChip,
-    'person-chip': PersonChip,
+    'data-table': DataTable,
     'tag-chips': TagChips,
     'tag-editor': TagEditor,
     'tooltip-button': TooltipButton,
@@ -94,11 +87,7 @@ export default {
 
     filterTypesAllowed: ['documents', 'events', 'locations', 'persons', 'sources'],
 
-    tableHeaders: [
-      { value: 'type', text: '', sortable: true, align: 'center', width: 50 },
-      { value: 'label', text: 'Label', sortable: true },
-      { value: 'details', text: 'Details', sortable: false },
-    ],
+    tableHeaders: ['tagtype', 'taglabel', 'tagdetails'],
 
   }),
 
@@ -114,11 +103,11 @@ export default {
       if (!this.filterTypes.includes('locations')) { return [] }
 
       return this.getLocations.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
-        details: (e.partofresolved || ''),
         icon: 'location',
         id: e.id,
-        label: (e.location || ''),
-        type: 'location',
+        tagdetails: (e.partofresolved || ''),
+        taglabel: (e.location || ''),
+        tagtype: 'location',
       }})
 
     },
@@ -128,11 +117,11 @@ export default {
       if (!this.filterTypes.includes('persons')) { return [] }
 
       return this.getPersons.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
-        details: `${(e.datebirthlong || '')} • ${(e.datedeathlong || '')}`.trim(),
         icon: `person-${e.gender || 'u'}${e.alive ? 'a' : 'd'}`,
         id: e.id,
-        label: `${e.firstname || ''} ${e.lastname || ''}`.trim(),
-        type: 'person',
+        tagdetails: `${(e.datebirthlong || '')} • ${(e.datedeathlong || '')}`.trim(),
+        taglabel: `${e.firstname || ''} ${e.lastname || ''}`.trim(),
+        tagtype: 'person',
       }})
 
     },
@@ -142,11 +131,11 @@ export default {
       return []
         .concat(this.getTaggedLocations)
         .concat(this.getTaggedPersons)
-        .sort((a, b) => compareStrings(a.label, b.label))
+        .sort((a, b) => compareStrings(a.taglabel, b.taglabel))
 
     },
 
-    getFilteredItems() { return this.getTaggedNodes.filter(e => !this.filterHasName || ((e.label || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.details || '').toLowerCase().includes(this.filterHasName.toLowerCase()))) },
+    getFilteredItems() { return this.getTaggedNodes.filter(e => !this.filterHasName || ((e.taglabel || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.tagdetails || '').toLowerCase().includes(this.filterHasName.toLowerCase()))) },
 
     filterSubtitleText()   { return `showing ${this.getFilteredItems.length} out of ${this.getTaggedNodes.length} entries` }
 

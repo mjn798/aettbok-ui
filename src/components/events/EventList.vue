@@ -34,23 +34,11 @@
             </v-expand-transition>
         </v-card-text>
         <v-card-text>
-            <v-data-table
+            <data-table
                 :headers="tableHeaders"
                 :items="getFilteredItems"
-            >
-                <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-                <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
-                <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
-                <template v-slot:[`item.attendedtext`]="{item}">
-                    <person-chip
-                        :id="person"
-                        :key="person"
-                        islink
-                        v-for="person in item.attended"
-                    />
-                </template>
-                <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
-            </v-data-table>
+                @edit="upsertItem"
+            />
         </v-card-text>
     </v-card>
 </template>
@@ -60,10 +48,8 @@ import { mapGetters } from 'vuex'
 import { toggleArrayValue } from '../../scripts/aettbok'
 
 import CardTitle from '../common/CardTitle.vue'
-import DocumentViewer from '../documents/DocumentViewer.vue'
+import DataTable from '../common/DataTable.vue'
 import EventEditor from './EventEditor.vue'
-import LocationChip from '../locations/LocationChip.vue'
-import PersonChip from '../persons/PersonChip.vue'
 import TooltipButton from '../common/TooltipButton.vue'
 
 export default {
@@ -72,10 +58,8 @@ export default {
 
     components: {
         'card-title': CardTitle,
-        'document-viewer': DocumentViewer,
+        'data-table': DataTable,
         'event-editor': EventEditor,
-        'location-chip': LocationChip,
-        'person-chip': PersonChip,
         'tooltip-button': TooltipButton,
     },
 
@@ -91,16 +75,9 @@ export default {
         filterHasName: '',
         filterTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
 
-        tableHeaders: [
-            { value: 'documentscount', text: '', sortable: true, width: 50 },
-            { value: 'typetext', text: 'Type', sortable: true },
-            { value: 'attendedtext', text: 'Attendees', sortable: false },
-            { value: 'date', text: 'Date', sortable: true },
-            { value: 'wasintext', text: 'Location', sortable: true },
-            { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
-        ],
-
         eventTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
+
+        tableHeaders: ['documentscount', 'typetext', 'attendedtext', 'date', 'wasintext', 'actions'],
 
     }),
 
@@ -117,7 +94,7 @@ export default {
             return this.getEvents
                 .filter(e => this.locationFilter ? (e.wasin || []).includes(this.locationFilter) : true)
                 .filter(e => this.filterTypes ? this.filterTypes.includes(e.type) : true)
-                .filter(e => !this.filterHasName || ((e.wasin || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedtext || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
+                .filter(e => !this.filterHasName || ((e.wasintext || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedtext || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
 
         },
 
