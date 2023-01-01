@@ -39,9 +39,9 @@
                 :items="getFilteredItems"
             >
                 <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-                <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
-                <template v-slot:[`item.date`]="{item}">{{ item.dateFull }}</template>
-                <template v-slot:[`item.attendedString`]="{item}">
+                <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
+                <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
+                <template v-slot:[`item.attendedtext`]="{item}">
                     <person-chip
                         :id="person"
                         :key="person"
@@ -49,7 +49,7 @@
                         v-for="person in item.attended"
                     />
                 </template>
-                <template v-slot:[`item.wasinString`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
+                <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -92,11 +92,11 @@ export default {
         filterTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
 
         tableHeaders: [
-            { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
-            { value: 'typeString', text: 'Type', sortable: true },
-            { value: 'attendedString', text: 'Attendees', sortable: false },
+            { value: 'documentscount', text: '', sortable: true, width: 50 },
+            { value: 'typetext', text: 'Type', sortable: true },
+            { value: 'attendedtext', text: 'Attendees', sortable: false },
             { value: 'date', text: 'Date', sortable: true },
-            { value: 'wasinString', text: 'Location', sortable: true },
+            { value: 'wasintext', text: 'Location', sortable: true },
             { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
         ],
 
@@ -117,7 +117,7 @@ export default {
             return this.getEvents
                 .filter(e => this.locationFilter ? (e.wasin || []).includes(this.locationFilter) : true)
                 .filter(e => this.filterTypes ? this.filterTypes.includes(e.type) : true)
-                .filter(e => !this.filterHasName || ((e.wasin || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedString || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
+                .filter(e => !this.filterHasName || ((e.wasin || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedtext || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
 
         },
 

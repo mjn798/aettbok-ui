@@ -5,7 +5,7 @@
             <v-card-text>
                 <source-picker :selected="item.sourcedby" @selectedItem="selectedSource" class="ma-2" label="Source" />
                 <v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" />
-                <v-text-field class="ma-2" dense hide-details label="Date" outlined v-model="item.date" />
+                <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
                 <v-textarea class="ma-2" dense height="500" hide-details label="Content" outlined v-model="item.content" />
                 <person-linker :persons="item.persons" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
             </v-card-text>
@@ -19,6 +19,7 @@ import { mapGetters } from 'vuex'
 import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
+import DatePicker from '../common/DatePicker.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
 import SourcePicker from '../sources/SourcePicker.vue'
 
@@ -28,6 +29,7 @@ export default {
 
     components: {
         'card-actions': CardActions,
+        'date-picker': DatePicker,
         'person-linker': PersonLinker,
         'source-picker': SourcePicker,
     },
@@ -81,6 +83,9 @@ export default {
         if (!this.item.index)     { this.item.index = null }
         if (!this.item.persons)   { this.item.persons = null }
         if (!this.item.sourcedby) { this.item.sourcedby = null }
+        if (!this.item.day)       { this.item.day = null }
+        if (!this.item.month)     { this.item.month = null }
+        if (!this.item.year)      { this.item.year = null }
 
         // call REST API
 
@@ -102,6 +107,10 @@ export default {
         return index === -1 ? null : this.item.persons.splice(index, 1)
     },
 
+    changeDay(value) { return this.item.day = value },
+    changeMonth(value) { return this.item.month = value },
+    changeYear(value) { return this.item.year = value },
+
   },
 
   watch: {
@@ -112,12 +121,14 @@ export default {
 
         return this.item = {
             content: null,
-            date: null,
+            day: null,
             id: null,
             index: null,
+            month: null,
             persons: [],
             sourcedby: null,
             tags: [],
+            year: null,
         }
 
     }

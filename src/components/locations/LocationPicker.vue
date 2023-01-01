@@ -52,7 +52,7 @@ export default {
             getLocations: 'getLocations',
         }),
 
-        getItems() { return this.getLocations.filter(e => e.id !== this.exclude).map(e => { return { text: e.location, type: (e.locationtypeString || ''), value: e.id } }) },
+        getItems() { return this.getLocations.filter(e => e.id !== this.exclude).map(e => { return { text: e.location, type: (e.locationtypetext || ''), value: e.id } }) },
 
     },
 

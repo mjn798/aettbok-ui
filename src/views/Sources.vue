@@ -30,8 +30,8 @@
       <v-card-text>
         <v-data-table :headers="tableHeaders" :items="getFilteredItems">
           <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-          <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documents" v-if="item.documents.length" /></template>
-          <template v-slot:[`item.storedinString`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
+          <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documents" v-if="item.documents.length" /></template>
+          <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -67,10 +67,10 @@ export default {
     filterHasText: '',
 
     tableHeaders: [
-      { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
+      { value: 'documentscount', text: '', sortable: true, width: 50 },
       { value: 'source', text: 'Source', sortable: true },
       { value: 'containedin', text: 'Contained in', sortable: true },
-      { value: 'storedinString', text: 'Stored in', sortable: true },
+      { value: 'storedintext', text: 'Stored in', sortable: true },
       { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
     ]
 
@@ -83,7 +83,7 @@ export default {
       getSources: 'getSources',
     }),
 
-    getFilteredItems() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.storedinString || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
+    getFilteredItems() { return this.getSources.filter(e => !this.filterHasText || (e.source || '').toLowerCase().includes(this.filterHasText.toLowerCase())) || (e.storedintext || '').toLowerCase().includes(this.filterHasText.toLowerCase()) },
 
     filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getSources.length} entries` }
 

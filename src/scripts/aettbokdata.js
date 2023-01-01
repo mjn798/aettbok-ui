@@ -71,6 +71,20 @@ function resolvePartOf(id, getFull = false, resolvedString = null) {
 
 
 
+// convert day, month, year to different date options
+
+function getAllDates(day, month, year, item, type = null) {
+
+    if (!(day || month || year)) { return item }
+
+    item[`date${type || ''}`] = getSortableDate(day, month, year)
+    item[`date${type || ''}short`] = getFormattedDate(day, month, year)
+    item[`date${type || ''}long`] = getFormattedDate(day, month, year, 'long')
+
+    return item
+
+}
+
 // format date to locale with different options
 
 function getFormattedDate(day, month, year, monthLength = 'short') {
@@ -97,7 +111,7 @@ function getFormattedDate(day, month, year, monthLength = 'short') {
 
 }
 
-// get ISO date for easily sorting by year, month, day
+// get date for easily sorting by year, month, day
 
 function getSortableDate(day, month, year) { return `${year ? year.toString().padStart(4, 0) : '0000'}-${month ? month.toString().padStart(2, 0) : '00'}-${day ? day.toString().padStart(2, 0) : '00'}` }
 
@@ -113,11 +127,14 @@ function getFormattedEventType(type) {
 
     switch(type) {
 
-        case 'BIRTH':     return 'Birth'
-        case 'DEATH':     return 'Death'
-        case 'MARRIAGE':  return 'Marriage'
-        case 'RESIDENCE': return 'Residence'
-        case 'WORK':      return 'Work'
+        case 'BAPTISM':    return 'Baptism'
+        case 'BIRTH':      return 'Birth'
+        case 'DEATH':      return 'Death'
+        case 'DIVORCE':    return 'Divorce'
+        case 'MARRIAGE':   return 'Marriage'
+        case 'MILITARY':   return 'Military'
+        case 'OCCUPATION': return 'Occupation'
+        case 'RESIDENCE':  return 'Residence'
 
         default: return null
 
@@ -147,18 +164,10 @@ export function processDocuments() {
 
         // calculated attributes
 
+        document = getAllDates(document.day, document.month, document.year, document)
+
         let source = store.getters.getSource(document.sourcedby)
-        if (source) { document.sourcedbyString = source.source }
-
-        // resolve date
-
-        if (document.date) {
-
-            let date = document.date.split('-')
-            document.dateLong = getFormattedDate(date[2], date[1], date[0])
-            document.dateFull = getFormattedDate(date[2], date[1], date[0], 'long')
-
-        }
+        if (source) { document.sourcedbytext = source.source }
 
     })
 
@@ -183,20 +192,13 @@ export function processEvents() {
 
         // calculated attributes
 
+        event = getAllDates(event.day, event.month, event.year, event)
+
+        event.documentscount = event.documentedby.length
+        event.typetext = getFormattedEventType(event.type)
+
         let wasin = store.getters.getLocation(event.wasin)
-        if (wasin) { event.wasinString = wasin.location }
-
-        event.numberOfDocuments     = event.documentedby.length
-        event.numberOfDocumentsIcon = `mdi-numeric-${event.numberOfDocuments < 10 ? event.numberOfDocuments : '9-plus'}-box${event.numberOfDocuments === 0 ? '-outline' : '-multiple'}`
-        event.typeString            = getFormattedEventType(event.type)
-
-        // resolve date
-
-        if (event.day || event.month || event.year) {
-            event.date = getSortableDate(event.day, event.month, event.year)
-            event.dateLong = getFormattedDate(event.day, event. month, event.year)
-            event.dateFull = getFormattedDate(event.day, event. month, event.year, 'long')
-        }
+        if (wasin) { event.wasintext = wasin.location }
 
         // resolve attendees
 
@@ -206,13 +208,13 @@ export function processEvents() {
 
             // fullname needs to be resolved here directly, as the person might not be processed yet
 
-            event.attendedString = event.attended.reduce((previousValue, currentValue) => {
+            event.attendedtext = event.attended.reduce((previousValue, currentValue) => {
                 let person = store.getters.getPerson(currentValue)
                 let fullname = `${person.firstname || ''} ${person.lastname || ''}`.trim()
                 return person ? `${previousValue}${fullname}, ` : previousValue
             }, '')
 
-            if (event.attendedString) { event.attendedString = event.attendedString.slice(0, -2) }
+            if (event.attendedtext) { event.attendedtext = event.attendedtext.slice(0, -2) }
 
         }
 
@@ -239,13 +241,11 @@ export function processLocations() {
 
         // calculated attributes
 
-        let locationtype = store.getters.getLocationType(location.locationtype)
-        if (locationtype) { location.locationtypeString = locationtype.type }
+        location.partofresolved = resolvePartOf(location.id, true)
+        location.partoftext = resolvePartOf(location.id, false)
 
-        location.numberOfDocuments     = location.documentedby.length
-        location.numberOfDocumentsIcon = `mdi-numeric-${location.numberOfDocuments < 10 ? location.numberOfDocuments : '9-plus'}-box${location.numberOfDocuments === 0 ? '-outline' : '-multiple'}`
-        location.partofLocation        = resolvePartOf(location.id, false)
-        location.partofResolved        = resolvePartOf(location.id, true)
+        let locationtype = store.getters.getLocationType(location.locationtype)
+        if (locationtype) { location.locationtypetext = locationtype.type }
 
     })
 
@@ -275,12 +275,9 @@ export function processPersons() {
 
         // calculated attributes
 
-        person.fullname              = `${person.firstname || ''} ${person.lastname || ''}`.trim()
-        person.icon                  = person.gender === 'f' ? 'mdi-human-female' : person.gender === 'm' ? 'mdi-human-male' : 'mdi-human-male-female'
-        person.iconColor             = person.gender === 'f' ? 'pink darken-2'    : person.gender === 'm' ? 'blue darken-2'  : 'grey'
-        person.marriages             = 0
-        person.numberOfDocuments     = person.documentedby.length
-        person.numberOfDocumentsIcon = `mdi-numeric-${person.numberOfDocuments < 10 ? person.numberOfDocuments : '9-plus'}-box-${person.numberOfDocuments === 0 ? 'outline' : 'multiple'}`
+        person.documentscount = person.documentedby.length
+        person.gendercolor = person.gender === 'm' ? 'blue darken-2' : person.gender === 'f' ? 'pink darken-2' : 'grey'
+        person.marriages = 0
 
         // event builder
 
@@ -290,34 +287,30 @@ export function processPersons() {
 
             if (!event) { return }
 
-            if (['MARRIAGE'].includes(event.type)) { person.marriages += 1 }
+            let type = event.type.toLowerCase()
 
-            if (['BIRTH', 'DEATH'].includes(event.type)) {
+            if (['marriage'].includes(type)) { return person.marriages += 1 }
 
-                // type
-
-                let type = event.type.toLowerCase()
+            if (['birth', 'death'].includes(type)) {
 
                 // dates
 
-                if (event.day)   { person[`${type}Day`]   = event.day   }
-                if (event.month) { person[`${type}Month`] = event.month }
-                if (event.year)  { person[`${type}Year`]  = event.year  }
+                if (event.day) { person[`date${type}day`] = event.day }
+                if (event.month) { person[`date${type}month`] = event.month }
+                if (event.year) { person[`date${type}year`] = event.year }
 
-                if (event.day || event.month || event.year) {
-                    person[`${type}`]     = getSortableDate(event.day, event.month, event.year)
-                    person[`${type}Long`] = getFormattedDate(event.day, event.month, event.year)
-                    person[`${type}Full`] = getFormattedDate(event.day, event.month, event.year, 'long')
-                }
+                if (event.day || event.month || event.year) { person = getAllDates(event.day, event.month, event.year, person, type) }
 
                 // locations
 
                 let location = store.getters.getLocation(extractRelationSingle(event.relations, 'Location', 'to'))
 
                 if (location) {
-                    person[`${type}LocationString`] = location.location
-                    person[`${type}Location`]       = location.id
+                    person[`${type}location`] = location.id
+                    person[`${type}locationtext`] = location.location
                 }
+
+                return
 
             }
         })
@@ -345,14 +338,13 @@ export function processSources() {
 
         // calculated attributes
 
-        source.numberOfDocuments     = source.documents.length
-        source.numberOfDocumentsIcon = `mdi-numeric-${source.numberOfDocuments < 10 ? source.numberOfDocuments : '9-plus'}-box${source.numberOfDocuments === 0 ? '-outline' : '-multiple'}`
+        source.documentscount = source.documents.length
 
         let containedin = store.getters.getLocation(source.containedin)
-        if (containedin) { source.containedinString = containedin.location }
+        if (containedin && containedin.location) { source.containedintext = containedin.location }
 
         let storedin = store.getters.getLocation(source.storedin)
-        if (storedin) { source.storedinString = storedin.location }
+        if (storedin && storedin.location ) { source.storedintext = storedin.location }
 
     })
 

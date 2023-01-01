@@ -7,12 +7,12 @@
             <v-spacer/>
             <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="person-edit" />
         </v-card-title>
-        <v-card-text v-if="selectedItem.birthFull || selectedItem.birthLocation || selectedItem.deathFull || selectedItem.deathLocation">
-            <div class="mb-2" v-if="selectedItem.birthFull || selectedItem.birthLocation">
-              <icon class="mx-1" color="grey lighten-1" icontype="event-birth" small /> {{ getDateLocationText('birth') }} <location-chip :id="selectedItem.birthLocation" v-if="selectedItem.birthLocation" />
+        <v-card-text v-if="selectedItem.datebirth || selectedItem.birthlocation || selectedItem.datedeath || selectedItem.deathlocation">
+            <div class="mb-2" v-if="selectedItem.datebirthlong || selectedItem.birthlocation">
+              <icon class="mx-1" color="grey lighten-1" icontype="event-birth" small /> {{ getDateLocationText('birth') }} <location-chip :id="selectedItem.birthlocation" v-if="selectedItem.birthlocation" />
             </div>
-            <div class="mb-2" v-if="selectedItem.deathFull || selectedItem.deathLocation">
-              <icon class="mx-1" color="grey lighten-1" icontype="event-death" small /> {{ getDateLocationText('death') }} <location-chip :id="selectedItem.deathLocation" v-if="selectedItem.deathLocation" />
+            <div class="mb-2" v-if="selectedItem.datedeath || selectedItem.deathlocation">
+              <icon class="mx-1" color="grey lighten-1" icontype="event-death" small /> {{ getDateLocationText('death') }} <location-chip :id="selectedItem.deathlocation" v-if="selectedItem.deathlocation" />
             </div>
         </v-card-text>
         <v-card-text v-if="selectedItem.tags.length"><tag-chips :selected="selectedItem.tags" /></v-card-text>
@@ -65,7 +65,7 @@ export default {
 
     upsertItem(id) { return this.editingItemId = id },
 
-    getDateLocationText(type) { return ((this.selectedItem[`${type}Full`] || '') + (this.selectedItem[`${type}Location`] ? ' in ' : '')).trim() },
+    getDateLocationText(type) { return ((this.selectedItem[`date${type}long`] || '') + (this.selectedItem[`${type}location`] ? ' in ' : '')).trim() },
 
   },
 

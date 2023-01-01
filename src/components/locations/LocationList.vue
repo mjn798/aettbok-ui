@@ -78,9 +78,9 @@ export default {
         filterType: null,
 
         tableHeaders: [
-            { value: 'locationtypeString', text: 'Type', sortable: true, align: 'end' },
+            { value: 'locationtypetext', text: 'Type', sortable: true, align: 'end' },
             { value: 'location', text: 'Location', sortable: true },
-            { value: 'partofResolved', text: 'Part of', sortable: true },
+            { value: 'partofresolved', text: 'Part of', sortable: true },
             { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 110 },
         ],
 
@@ -101,7 +101,7 @@ export default {
                 .filter(e => !(this.filterType && this.filterType !== e.locationtype))
                 .filter(e => {
                     if (!this.filterHasName) { return true }
-                    if (this.filterPartof) { return ((e.location || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.partofResolved || '').toLowerCase().includes(this.filterHasName.toLowerCase())) }
+                    if (this.filterPartof) { return ((e.location || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.partofresolved || '').toLowerCase().includes(this.filterHasName.toLowerCase())) }
                     return ((e.location || '').toLowerCase().includes(this.filterHasName.toLowerCase()))
                 })
 

@@ -55,7 +55,7 @@ export default {
             getDocuments: 'getDocuments',
         }),
 
-        getItems() { return this.getDocuments.map(e => { return { source: e.sourcedbyString, text: e.index, value: e.id }}) },
+        getItems() { return this.getDocuments.map(e => { return { source: e.sourcedbytext, text: e.index, value: e.id }}) },
 
     },
 

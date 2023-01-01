@@ -33,7 +33,7 @@
           :items="getFilteredItems"
         >
           <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="upsertItem(item.id)" buttontype="edit" small /></template>
-          <template v-slot:[`item.date`]="{item}">{{ item.dateLong }}</template>
+          <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -65,7 +65,7 @@ export default {
     filterHasText: '',
 
     tableHeaders: [
-      { value: 'sourcedbyString', text: 'Source', sortable: true },
+      { value: 'sourcedbytext', text: 'Source', sortable: true },
       { value: 'index', text: 'Document Index', sortable: true },
       { value: 'date', text: 'Date', sortable: true },
       { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 50 },
@@ -79,7 +79,7 @@ export default {
       getDocuments: 'getDocuments',
     }),
 
-    getFilteredItems() { return this.getDocuments.filter(e => !this.filterHasText || (e.index || '').toLowerCase().includes(this.filterHasText.toLowerCase())  || (e.sourcedbyString || '').toLowerCase().includes(this.filterHasText.toLowerCase())) },
+    getFilteredItems() { return this.getDocuments.filter(e => !this.filterHasText || (e.index || '').toLowerCase().includes(this.filterHasText.toLowerCase())  || (e.sourcedbytext || '').toLowerCase().includes(this.filterHasText.toLowerCase())) },
 
     filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getDocuments.length} entries` }
 

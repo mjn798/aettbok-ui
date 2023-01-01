@@ -10,8 +10,8 @@
         <v-list-item :to="getProfileLink" v-else>
             <v-list-item-icon><icon :icontype="getIcontype" /></v-list-item-icon>
             <v-list-item-content>
-                <v-list-item-title class="mb-1 body-2">{{ selectedPerson.fullname }}</v-list-item-title>
-                <v-list-item-subtitle class="caption">{{ selectedPerson.birthLong }} &bull; {{ selectedPerson.deathLong }}</v-list-item-subtitle>
+                <v-list-item-title class="mb-1 body-2">{{ getFullName }}</v-list-item-title>
+                <v-list-item-subtitle class="caption">{{ selectedPerson.datebirthshort }} &bull; {{ selectedPerson.datedeathshort }}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
     </v-card>
@@ -42,8 +42,8 @@ export default {
 
     selectedPerson() { return this.getPerson(this.id) },
 
+    getFullName() { return `${this.selectedPerson.firstname || ''} ${this.selectedPerson.lastname || ''}`.trim() },
     getIcontype() { return `person-${this.selectedPerson.gender || 'u'}${this.selectedPerson.alive ? 'a' : 'd' }`},
-
     getProfileLink() { return `/persons/${this.id}` },
 
   },

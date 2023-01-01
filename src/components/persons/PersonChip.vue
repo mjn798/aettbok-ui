@@ -36,8 +36,8 @@ export default {
 
         selectedPerson() { return this.getPerson(this.id) },
 
-        getPersonColor() { return this.selectedPerson ? this.selectedPerson.iconColor : 'grey' },
-        getPersonDates() { return this.selectedPerson ? `(${(this.longdate ? this.selectedPerson.birthFull : this.selectedPerson.birthYear) || ''} • ${(this.longdate ? this.selectedPerson.deathFull : this.selectedPerson.deathYear) || ''})`.trim() : null },
+        getPersonColor() { return this.selectedPerson.gendercolor },
+        getPersonDates() { return this.selectedPerson ? `(${(this.longdate ? this.selectedPerson.datebirthshort : this.selectedPerson.datebirthyear) || ''} • ${(this.longdate ? this.selectedPerson.datebirthshort : this.selectedPerson.datedeathyear) || ''})`.trim() : null },
         getPersonName() { return this.selectedPerson ? `${this.selectedPerson.firstname || ''} ${this.selectedPerson.lastname || ''}`.trim() : null },
         getPersonLink() { return (this.islink && this.selectedPerson) ? `/persons/${this.selectedPerson.id}` : null }
 

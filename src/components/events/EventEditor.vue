@@ -4,11 +4,7 @@
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
                 <v-autocomplete :items="eventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" />
-                <v-row no-gutters>
-                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Day" outlined type="number" v-model="item.day" /></v-col>
-                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Month" outlined type="number" v-model="item.month" /></v-col>
-                    <v-col cols="12" sm="4"><v-text-field class="ma-2" clearable dense hide-details hide-spin-buttons label="Year" outlined type="number" v-model="item.year" /></v-col>
-                </v-row>
+                <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
                 <location-picker :selected="item.wasin" @selectedItem="selectedLocation" class="ma-2" label="Location" />
                 <person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
                 <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
@@ -24,6 +20,7 @@ import { mapGetters } from 'vuex'
 import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
+import DatePicker from '../common/DatePicker.vue'
 import DocumentLinker from '../documents/DocumentLinker.vue'
 import LocationPicker from '../locations/LocationPicker.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
@@ -34,6 +31,7 @@ export default {
 
     components: {
         'card-actions': CardActions,
+        'date-picker': DatePicker,
         'document-linker': DocumentLinker,
         'location-picker': LocationPicker,
         'person-linker': PersonLinker,
@@ -131,6 +129,10 @@ export default {
         return index === -1 ? null : this.item.attended.splice(index, 1)
     },
 
+    changeDay(value) { return this.item.day = value },
+    changeMonth(value) { return this.item.month = value },
+    changeYear(value) { return this.item.year = value },
+
   },
 
   watch: {
@@ -144,11 +146,11 @@ export default {
         return this.item = {
             attended: attended,
             comment: null,
-            documentedby: [],
-            tags: [],
             day: null,
+            documentedby: [],
             id: null,
             month: null,
+            tags: [],
             type: null,
             wasin: null,
             year: null,

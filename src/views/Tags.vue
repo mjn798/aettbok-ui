@@ -114,7 +114,7 @@ export default {
       if (!this.filterTypes.includes('locations')) { return [] }
 
       return this.getLocations.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
-        details: (e.partofResolved || ''),
+        details: (e.partofresolved || ''),
         icon: 'location',
         id: e.id,
         label: (e.location || ''),
@@ -128,10 +128,10 @@ export default {
       if (!this.filterTypes.includes('persons')) { return [] }
 
       return this.getPersons.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
-        details: `${(e.birthFull || '')} • ${(e.deathFull || '')}`.trim(),
+        details: `${(e.datebirthlong || '')} • ${(e.datedeathlong || '')}`.trim(),
         icon: `person-${e.gender || 'u'}${e.alive ? 'a' : 'd'}`,
         id: e.id,
-        label: `${e.lastname || ''} ${e.firstname || ''}`.trim(),
+        label: `${e.firstname || ''} ${e.lastname || ''}`.trim(),
         type: 'person',
       }})
 

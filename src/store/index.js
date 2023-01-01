@@ -97,7 +97,7 @@ export default new Vuex.Store({
 
     getDocument: (state) => (id) => state.documents.find(e => e.id === id),
 
-    getDocuments: (state) => state.documents.sort((a, b) => (a.index || '').toUpperCase().localeCompare((b.index || '').toUpperCase())).sort((a, b) => (a.date || '').localeCompare(b.date || '')),
+    getDocuments: (state) => state.documents.sort((a, b) => (a.index || '').toUpperCase().localeCompare((b.index || '').toUpperCase())).sort((a, b) => (`${a.year ? a.year.toString().padStart(4, 0) : '0000'}-${a.month ? a.month.toString().padStart(2, 0) : '00'}-${a.day ? a.day.toString().padStart(2, 0) : '00'}`).localeCompare(`${b.year ? b.year.toString().padStart(4, 0) : '0000'}-${b.month ? b.month.toString().padStart(2, 0) : '00'}-${b.day ? b.day.toString().padStart(2, 0) : '00'}`)),
 
     /* EVENTS */
 

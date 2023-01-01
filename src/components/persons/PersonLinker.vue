@@ -60,7 +60,7 @@ export default {
             getPersons: 'getPersons',
         }),
 
-        getItems() { return this.getPersons.filter(e => e.id !== this.exclude).map(e => { return { dates: `(${e.birthYear || ''} • ${e.deathYear || ''})`.trim(), text: `${e.lastname || ''} ${e.firstname || ''}`.trim(), value: e.id }}) },
+        getItems() { return this.getPersons.filter(e => e.id !== this.exclude).map(e => { return { dates: `(${e.datebirthyear || ''} • ${e.datedeathyear || ''})`.trim(), text: `${e.lastname || ''} ${e.firstname || ''}`.trim(), value: e.id }}) },
 
     },
 

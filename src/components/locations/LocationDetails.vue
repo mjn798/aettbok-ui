@@ -7,7 +7,7 @@
             <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="location-edit" />
         </v-card-title>
         <v-card-text>
-            {{ `${selectedItem.locationtypeString} ${selectedItem.partofResolved ? 'in ' + selectedItem.partofResolved : ''}`.trim() }}
+            {{ `${selectedItem.locationtypetext} ${selectedItem.partofresolved ? 'in ' + selectedItem.partofresolved : ''}`.trim() }}
         </v-card-text>
         <v-card-text v-if="selectedItem.tags.length"><tag-chips :selected="selectedItem.tags" /></v-card-text>
     </v-card>

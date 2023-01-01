@@ -40,11 +40,11 @@
                     <icon :icontype="getPersonIcon(item)" />
                     <icon icontype="marriage" small v-if="item.marriages" />
                 </template>
-                <template v-slot:[`item.numberOfDocuments`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
-                <template v-slot:[`item.birth`]="{item}">{{ item.birthLong }}</template>
-                <template v-slot:[`item.death`]="{item}">{{ item.deathLong }}</template>
-                <template v-slot:[`item.birthLocationString`]="{item}"><location-chip :id="item.birthLocation" v-if="item.birthLocation" /></template>
-                <template v-slot:[`item.deathLocationString`]="{item}"><location-chip :id="item.deathLocation" v-if="item.deathLocation" /></template>
+                <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
+                <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
+                <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>
+                <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
+                <template v-slot:[`item.deathlocationtext`]="{item}"><location-chip :id="item.deathlocation" v-if="item.deathlocation" /></template>
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -84,14 +84,14 @@ export default {
     filterIsMarried: -1,
 
     tableHeaders: [
-        { value: 'numberOfDocuments', text: '', sortable: true, width: 50 },
+        { value: 'documentscount', text: '', sortable: true, width: 50 },
         { value: 'icon', text: '', sortable: false, width: 90 },
         { value: 'lastname', text: 'Last Name', sortable: true },
         { value: 'firstname', text: 'First Name', sortable: true },
-        { value: 'birth', text: 'Birth', sortable: true },
-        { value: 'birthLocationString', text: 'Birth', sortable: true },
-        { value: 'death', text: 'Death', sortable: true },
-        { value: 'deathLocationString', text: 'Death', sortable: true },
+        { value: 'datebirth', text: 'Birth', sortable: true },
+        { value: 'birthlocationtext', text: 'Birth', sortable: true },
+        { value: 'datedeath', text: 'Death', sortable: true },
+        { value: 'deathlocationtext', text: 'Death', sortable: true },
         { value: 'actions', text: 'Actions', sortable: false, align: 'center', width: 110 },
     ],
 
@@ -111,7 +111,7 @@ export default {
                 .filter(e => this.filterIsAlive === -1 || (!!this.filterIsAlive === e.alive))
                 .filter(e => this.filterIsGender === -1 || (this.filterIsGender && e.gender === 'm') || (!this.filterIsGender && e.gender === 'f'))
                 .filter(e => this.filterIsMarried === -1 || (!!this.filterIsMarried === !!e.marriages))
-                .filter(e => !this.filterHasName || ((e.firstname || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.lastname || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
+                .filter(e => !this.filterHasName || (`${e.firstname || ''} ${e.lastname || ''}`.trim().toLocaleLowerCase().includes(this.filterHasName.toLocaleLowerCase())))
 
     },
 

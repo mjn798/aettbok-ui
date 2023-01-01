@@ -83,7 +83,7 @@ export default {
         upsertItem(id) { return this.editingItemId = id },
 
         getOtherAttendees(event) { return (event.attended || null).filter(e => e !== this.selectedPerson.id) },
-        getDateLocationText(event) { return `${event.dateFull || ''}${event.wasin ? ' in ' : ''}`.trim() },
+        getDateLocationText(event) { return `${event.datelong || ''}${event.wasin ? ' in ' : ''}`.trim() },
 
     },
 

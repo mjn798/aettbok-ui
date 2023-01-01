@@ -14,7 +14,7 @@
             label
             v-for="document in getDocuments"
         >
-            <small class="mr-2">{{ document.sourcedbyString }}</small>
+            <small class="mr-2">{{ document.sourcedbytext }}</small>
             {{ document.index }}
         </v-chip>
     </v-chip-group>
