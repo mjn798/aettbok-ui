@@ -45,7 +45,6 @@
                 :headers="tableHeaders"
                 :items="getFilteredItems"
                 @edit="upsertItem"
-                @view="navigateTo"
             />
         </v-card-text>
     </v-card>
@@ -79,7 +78,7 @@ export default {
         filterPartof: false,
         filterType: null,
 
-        tableHeaders: ['locationtypetext', 'location', 'partofresolved', 'actionsview'],
+        tableHeaders: ['locationtypetext', 'location', 'partofresolved', 'actions'],
 
     }),
 
@@ -111,7 +110,6 @@ export default {
     methods: {
 
         upsertItem(id) { return this.editingItemId = id },
-        navigateTo(id) { return this.$router.push(`/locations/${id}`) },
 
         toggleFilter() {
 

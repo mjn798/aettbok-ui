@@ -128,7 +128,7 @@ export default {
         return index === -1 ? null : this.item.hasparents.splice(index, 1)
     },
 
-    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) }
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
 
   },
 

@@ -94,9 +94,40 @@ export default {
   computed: {
 
     ...mapGetters({
+      getDocuments: 'getDocuments',
+      getEvents: 'getEvents',
       getLocations: 'getLocations',
       getPersons: 'getPersons',
+      getSources: 'getSources',
     }),
+
+    getTaggedDocuments() {
+
+      if (!this.filterTypes.includes('documents')) { return [] }
+
+      return this.getDocuments.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+        icon: 'document',
+        id: e.id,
+        tagdetails: (e.datelong || ''),
+        taglabel: `${e.sourcedbytext} ${e.index}`.trim(),
+        tagtype: 'document',
+      }})
+
+    },
+
+    getTaggedEvents() {
+
+      if (!this.filterTypes.includes('events')) { return [] }
+
+      return this.getEvents.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+        icon: 'event',
+        id: e.id,
+        tagdetails: `${e.attendedtext || ''} (${e.datelong || ''})`.trim(),
+        taglabel: (e.typetext || ''),
+        tagtype: 'event',
+      }})
+
+    },
 
     getTaggedLocations() {
 
@@ -126,11 +157,29 @@ export default {
 
     },
 
+    getTaggedSources() {
+
+      if (!this.filterTypes.includes('sources')) { return [] }
+
+      return this.getSources.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+        icon: 'source',
+        id: e.id,
+        tagdetails: `${e.containedintext || ''} - ${e.storedintext || ''}`.trim(),
+        taglabel: (e.source || '').trim(),
+        tagtype: 'source',
+      }})
+
+    },
+
     getTaggedNodes() {
 
       return []
+        .concat(this.getTaggedDocuments)
+        .concat(this.getTaggedEvents)
         .concat(this.getTaggedLocations)
         .concat(this.getTaggedPersons)
+        .concat(this.getTaggedSources)
+        .sort((a, b) => compareStrings(a.tagdetails, b.tagdetails))
         .sort((a, b) => compareStrings(a.taglabel, b.taglabel))
 
     },

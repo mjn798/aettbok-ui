@@ -8,6 +8,7 @@
                 <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
                 <v-textarea class="ma-2" dense height="500" hide-details label="Content" outlined v-model="item.content" />
                 <person-linker :persons="item.persons" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -22,6 +23,7 @@ import CardActions from '../common/CardActions.vue'
 import DatePicker from '../common/DatePicker.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
 import SourcePicker from '../sources/SourcePicker.vue'
+import TagChips from '../tags/TagChips.vue'
 
 export default {
 
@@ -32,6 +34,7 @@ export default {
         'date-picker': DatePicker,
         'person-linker': PersonLinker,
         'source-picker': SourcePicker,
+        'tag-chips': TagChips,
     },
 
     props: {
@@ -110,6 +113,8 @@ export default {
     changeDay(value) { return this.item.day = value },
     changeMonth(value) { return this.item.month = value },
     changeYear(value) { return this.item.year = value },
+
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
 
   },
 

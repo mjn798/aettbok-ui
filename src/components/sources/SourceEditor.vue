@@ -8,6 +8,7 @@
                 <location-picker class="ma-2" :selected="item.storedin" @selectedItem="selectedLocation" label="Stored in" />
                 <v-text-field class="ma-2" dense hide-details label="Author" outlined v-model="item.author" />
                 <v-text-field class="ma-2" dense hide-details label="Link" outlined v-model="item.link" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -21,6 +22,7 @@ import * as aettbok from '../../scripts/aettbok'
 import CardActions from '../common/CardActions.vue'
 import LocationPicker from '../locations/LocationPicker.vue'
 import SourcePicker from './SourcePicker.vue'
+import TagChips from '../tags/TagChips.vue'
 
 export default {
 
@@ -30,6 +32,7 @@ export default {
         'card-actions': CardActions,
         'location-picker': LocationPicker,
         'source-picker': SourcePicker,
+        'tag-chips': TagChips,
     },
 
     props: {
@@ -91,6 +94,8 @@ export default {
 
     selectedLocation(id) { return this.item.storedin = id },
     selectedContainedIn(id) { return this.item.containedin = id },
+
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
 
   },
 

@@ -44,8 +44,8 @@ export default {
 
     isLoading: false,
 
-    username: 'neima@gmx.net', // null,
-    password: 'test1234', // null,
+    username: null,
+    password: null,
 
   }),
 

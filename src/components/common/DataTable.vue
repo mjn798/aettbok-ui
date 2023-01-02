@@ -1,47 +1,59 @@
 <template>
-    <v-data-table
-        :headers="getTableHeaders"
-        :items="items"
-    >
-        <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="edit(item.id)" buttontype="edit" small /></template>
-        <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
-        <template v-slot:[`item.containedintext`]="{item}"><location-chip :id="item.containedin" v-if="item.containedin" /></template>
-        <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
-        <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
-        <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>
-        <template v-slot:[`item.deathlocationtext`]="{item}"><location-chip :id="item.deathlocation" v-if="item.deathlocation" /></template>
-        <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
-        <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
-        <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
-        <template v-slot:[`item.actionsview`]="{item}">
-            <tooltip-button @click="edit(item.id)" buttontype="edit" small />
-            <tooltip-button @click="view(item.id)" buttontype="show-details" small />
-        </template>
-        <template v-slot:[`item.attendedtext`]="{item}">
-            <person-chip
-                :id="person"
-                :key="person"
-                islink
-                v-for="person in item.attended"
-            />
-        </template>
-        <template v-slot:[`item.personicons`]="{item}">
-            <icon :icontype="getPersonIcon(item)" />
-            <icon icontype="marriage" small v-if="item.marriages" />
-        </template>
-        <template v-slot:[`item.tagtype`]="{item}"><icon :icontype="item.icon" /></template>
-        <template v-slot:[`item.taglabel`]="{item}">
-            <location-chip :id="item.id" v-if="item.id && item.tagtype === 'location'" />
-            <person-chip :id="item.id" islink v-if="item.id && item.tagtype === 'person'" />
-        </template>
-    </v-data-table>
+    <div>
+        <event-editor :id="editingEventId" @close="upsertEvent(undefined)" />
+        <v-data-table
+            :footer-props="{ 'items-per-page-options': [15, 25, 50, -1] }"
+            :headers="getTableHeaders"
+            :items="items"
+        >
+            <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="edit(item.id)" buttontype="edit" small /></template>
+            <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
+            <template v-slot:[`item.containedintext`]="{item}"><location-chip :id="item.containedin" v-if="item.containedin" /></template>
+            <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
+            <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
+            <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>
+            <template v-slot:[`item.deathlocationtext`]="{item}"><location-chip :id="item.deathlocation" v-if="item.deathlocation" /></template>
+            <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
+            <template v-slot:[`item.location`]="{item}"><location-chip :id="item.id" v-if="item.id" /></template>
+            <template v-slot:[`item.sourcedbytext`]="{item}"><source-chip :id="item.sourcedby" /></template>
+            <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
+            <template v-slot:[`item.tagtype`]="{item}"><icon :icontype="item.icon" /></template>
+            <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
+            <template v-slot:[`item.actionsview`]="{item}">
+                <tooltip-button @click="edit(item.id)" buttontype="edit" small />
+                <tooltip-button @click="view(item.id)" buttontype="show-details" small />
+            </template>
+            <template v-slot:[`item.attendedtext`]="{item}">
+                <person-chip
+                    :id="person"
+                    :key="person"
+                    islink
+                    v-for="person in item.attended"
+                />
+            </template>
+            <template v-slot:[`item.personicons`]="{item}">
+                <icon :icontype="getPersonIcon(item)" />
+                <icon icontype="marriage" small v-if="item.marriages" />
+            </template>
+            <template v-slot:[`item.taglabel`]="{item}">
+                <document-viewer-list :listofids="[item.id]" v-if="item.id && item.tagtype === 'document'" />
+                <location-chip :id="item.id" v-if="item.id && item.tagtype === 'location'" />
+                <person-chip :id="item.id" islink v-if="item.id && item.tagtype === 'person'" />
+                <source-chip :id="item.id" v-if="item.id && item.tagtype === 'source'" />
+                <div class="mx-2" v-if="item.id && item.tagtype === 'event'">{{ item.taglabel }} <tooltip-button @click="upsertEvent(item.id)" buttontype="edit" small /></div>
+            </template>
+        </v-data-table>
+    </div>
 </template>
 
 <script>
 import DocumentViewer from '../documents/DocumentViewer.vue'
+import DocumentViewerList from '../documents/DocumentViewerList.vue'
+import EventEditor from '../events/EventEditor.vue'
 import Icon from '../common/Icon.vue'
 import LocationChip from '../locations/LocationChip.vue'
 import PersonChip from '../persons/PersonChip.vue'
+import SourceChip from '../sources/SourceChip.vue'
 import TooltipButton from './TooltipButton.vue'
 
 export default {
@@ -55,13 +67,18 @@ export default {
 
     components: {
         'document-viewer': DocumentViewer,
+        'document-viewer-list': DocumentViewerList,
+        'event-editor': EventEditor,
         'icon': Icon,
         'location-chip': LocationChip,
         'person-chip': PersonChip,
+        'source-chip': SourceChip,
         'tooltip-button': TooltipButton,
     },
 
     data: () => ({
+
+        editingEventId: undefined,
 
         tableHeaders: [
 
@@ -107,6 +124,8 @@ export default {
 
         edit(id) { return this.$emit('edit', id) },
         view(id) { return this.$emit('view', id) },
+
+        upsertEvent(id) { return this.editingEventId = id },
 
         getPersonIcon(person) { return `person-${person.gender || 'u'}${person.alive ? 'a' : 'd'}` },
 

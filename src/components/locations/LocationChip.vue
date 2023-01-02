@@ -2,9 +2,10 @@
     <v-chip
         :to="getLocationLink"
         class="ma-1"
+        color="grey darken-4"
         label
-        small
         outlined
+        small
     >
         {{ getLocationName }}
     </v-chip>
@@ -27,10 +28,10 @@ export default {
             getLocation: 'getLocation',
         }),
 
-        selectedLocation() { return this.getLocation(this.id) },
+        selectedItem() { return this.getLocation(this.id) },
 
-        getLocationName() { return this.selectedLocation ? this.selectedLocation.location || 'n/a' : 'n/a' },
-        getLocationLink() { return this.selectedLocation ? `/locations/${this.selectedLocation.id}` || null : null },
+        getLocationName() { return this.selectedItem ? this.selectedItem.location || 'n/a' : 'n/a' },
+        getLocationLink() { return this.selectedItem ? `/locations/${this.selectedItem.id}` || null : null },
 
     },
 

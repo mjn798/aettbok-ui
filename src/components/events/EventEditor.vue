@@ -9,6 +9,7 @@
                 <person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
                 <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
                 <v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -24,6 +25,7 @@ import DatePicker from '../common/DatePicker.vue'
 import DocumentLinker from '../documents/DocumentLinker.vue'
 import LocationPicker from '../locations/LocationPicker.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
+import TagChips from '../tags/TagChips.vue'
 
 export default {
 
@@ -35,6 +37,7 @@ export default {
         'document-linker': DocumentLinker,
         'location-picker': LocationPicker,
         'person-linker': PersonLinker,
+        'tag-chips': TagChips,
     },
 
     props: {
@@ -133,6 +136,8 @@ export default {
     changeMonth(value) { return this.item.month = value },
     changeYear(value) { return this.item.year = value },
 
+    toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
+
   },
 
   watch: {
@@ -142,6 +147,7 @@ export default {
         if (id) { return this.item = JSON.parse(JSON.stringify(this.getEvent(id))) }
 
         let attended = this.$route.name === 'Persons' ? [this.$route.params.id] : []
+        let wasin = this.$route.name === 'Locations' ? this.$route.params.id : null
         
         return this.item = {
             attended: attended,
@@ -152,7 +158,7 @@ export default {
             month: null,
             tags: [],
             type: null,
-            wasin: null,
+            wasin: wasin,
             year: null,
         }
 
