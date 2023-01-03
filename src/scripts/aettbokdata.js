@@ -65,6 +65,29 @@ function resolvePartOf(id, getFull = false, resolvedString = null) {
 
 }
 
+function resolveParts(id, parts = []) {
+
+    // return if location does not exist or has no relations
+    let location = store.getters.getLocation(id)
+    if (!(location && location.relations)) { return parts }
+
+    // return if no child locations are found
+    let relations = extractRelations(location.relations, 'Location', 'from')
+    if (!(relations && relations.length)) { return parts }
+
+    relations.forEach(e => {
+
+        let child = store.getters.getLocation(e)
+        if (!child) { return }
+        
+        parts.push({ id: child.id, text: child.location })
+        parts = resolveParts(e, parts)
+
+    })
+
+    return parts
+
+}
 
 
 /* DATE FUNCTIONS */
@@ -243,6 +266,7 @@ export function processLocations() {
 
         location.partofresolved = resolvePartOf(location.id, true)
         location.partoftext = resolvePartOf(location.id, false)
+        location.parts = resolveParts(location.id)
 
         let locationtype = store.getters.getLocationType(location.locationtype)
         if (locationtype) { location.locationtypetext = locationtype.type }

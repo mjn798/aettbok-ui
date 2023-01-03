@@ -64,7 +64,7 @@ export default {
     },
 
     props: {
-        locationFilter: { type: String, default: null },
+        locationFilter: { type: Array, default: () => [] },
     },
 
     data: () => ({
@@ -89,10 +89,10 @@ export default {
 
         getFilteredItems() {
 
-            if (!(this.filterState || this.locationFilter)) { return this.getEvents }
+            if (!(this.filterState || this.locationFilter.length)) { return this.getEvents }
 
             return this.getEvents
-                .filter(e => this.locationFilter ? (e.wasin || []).includes(this.locationFilter) : true)
+                .filter(e => this.locationFilter.length ? this.locationFilter.includes(e.wasin || null) : true)
                 .filter(e => this.filterTypes ? this.filterTypes.includes(e.type) : true)
                 .filter(e => !this.filterHasName || ((e.wasintext || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedtext || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
 
