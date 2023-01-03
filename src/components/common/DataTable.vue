@@ -8,7 +8,6 @@
         >
             <template v-slot:[`item.actions`]="{item}"><tooltip-button @click="edit(item.id)" buttontype="edit" small /></template>
             <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
-            <template v-slot:[`item.containedintext`]="{item}"><location-chip :id="item.containedin" v-if="item.containedin" /></template>
             <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
             <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
             <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>

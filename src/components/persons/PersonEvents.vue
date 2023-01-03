@@ -7,7 +7,7 @@
         />
         <v-card-text
             :key="event.id"
-            v-for="event in getEventsForPerson(selectedPerson.id)"
+            v-for="event in getItems"
         >
             <v-card>
                 <v-list-item>
@@ -70,11 +70,25 @@ export default {
     computed: {
 
         ...mapGetters({
+            getEvents: 'getEvents',
             getEventsForPerson: 'getEventsForPerson',
             getPerson: 'getPerson',
         }),
 
         selectedPerson() { return this.getPerson(this.$route.params.id) },
+
+        getItems() {
+
+            let involvedids = [this.selectedPerson.id, ...this.selectedPerson.haschildren]
+
+            let events = this.getEvents.filter(e => e.attended.some(person => involvedids.includes(person))).filter(e => e.attended.includes(this.selectedPerson.id) || e.type === 'BIRTH')
+
+            events = JSON.parse(JSON.stringify(events))
+            events.forEach(e => { if (!e.attended.includes(this.selectedPerson.id) && e.type === 'BIRTH') { e.type = 'CHILDBIRTH' } })
+
+            return events
+
+        }
 
     },
 

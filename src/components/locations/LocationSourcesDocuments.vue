@@ -6,7 +6,7 @@
             v-for="source in getSourcesForLocation"
         >
             {{ source.source }}
-            <document-viewer-list :listofids="source.documents" />
+            <document-viewer-list :listofids="source.documentedby" />
         </v-card-text>
     </v-card>
 </template>
@@ -35,9 +35,9 @@ export default {
             getSources: 'getSources',
         }),
 
-        selectedLocation() { return this.getLocation(this.$route.params.id) },
+        selectedItem() { return this.getLocation(this.$route.params.id) },
 
-        getSourcesForLocation() { return this.getSources.filter(e => e.storedin === this.selectedLocation.id) },
+        getSourcesForLocation() { return this.getSources.filter(e => e.storedin === this.selectedItem.id) },
 
     },
 

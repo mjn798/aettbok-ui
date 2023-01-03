@@ -12,6 +12,7 @@
 
 const colorMale = 'blue darken-2'
 const colorFemale = 'pink darken-2'
+const childbirth = 'grey lighten-1'
 
 const icons = new Map()
 
@@ -37,6 +38,7 @@ icons.set('edit', { icon: 'mdi-pencil', class: null, color: null })
 icons.set('event', { icon: 'mdi-calendar', class: null, color: null })
 icons.set('event-baptism', { icon: 'mdi-tilde', class: null, color: null })
 icons.set('event-birth', { icon: 'mdi-asterisk', class: null, color: null })
+icons.set('event-childbirth', { icon: 'mdi-triangle-outline', class: null, color: childbirth })
 icons.set('event-death', { icon: 'mdi-cross', class: null, color: null })
 icons.set('event-divorce', { icon: 'mdi-circle-off-outline', class: null, color: null })
 icons.set('event-marriage', { icon: 'mdi-set-none', class: null, color: null })

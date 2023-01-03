@@ -364,8 +364,8 @@ export function processSources() {
 
         source.documentscount = source.documentedby.length
 
-        let containedin = store.getters.getLocation(source.containedin)
-        if (containedin && containedin.location) { source.containedintext = containedin.location }
+        let containedin = store.getters.getSource(source.containedin)
+        if (containedin && containedin.source) { source.containedintext = containedin.source }
 
         let storedin = store.getters.getLocation(source.storedin)
         if (storedin && storedin.location ) { source.storedintext = storedin.location }
