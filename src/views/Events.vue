@@ -1,21 +1,127 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12"><event-list /></v-col>
-    </v-row>
-  </v-container>
+  <v-container><v-row><v-col>
+    <event-editor :id="editingItemId" @close="upsertItem(undefined)" />
+    <v-card>
+      <card-title
+        :filterIconState="filterState"
+        @click="upsertItem(null)"
+        @filter="toggleFilter"
+        titletype="event"
+      />
+      <v-card-text>
+        <v-expand-transition>
+          <v-card v-if="filterState">
+            <v-card-title>
+              <tooltip-button
+                :buttontype="`${isTypeSelected(type) ? 'showing' : 'hiding'}-${(type || '').toLowerCase()}`"
+                :key="type"
+                @click="toggleFilterType(type)"
+                v-for="type in eventTypes"
+              />
+              <v-spacer/>
+              <v-text-field
+                class="ma-2"
+                clearable
+                dense
+                hide-details
+                label="Search"
+                outlined
+                prepend-inner-icon="mdi-magnify"
+                v-model="filterHasName"
+              />
+            </v-card-title>
+            <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
+          </v-card>
+        </v-expand-transition>
+      </v-card-text>
+      <v-card-text>
+        <data-table
+          :headers="tableHeaders"
+          :items="getFilteredItems"
+          @edit="upsertItem"
+        />
+      </v-card-text>
+    </v-card>
+  </v-col></v-row></v-container>
 </template>
 
 <script>
-import EventList from '../components/events/EventList.vue'
+import { mapGetters } from 'vuex'
+import { toggleArrayValue } from '../scripts/aettbok'
+
+import CardTitle from '../components/common/CardTitle.vue'
+import DataTable from '../components/common/DataTable.vue'
+import EventEditor from '../components/events/EventEditor.vue'
+import TooltipButton from '../components/common/TooltipButton.vue'
 
 export default {
 
   name: 'Events',
 
   components: {
-    'event-list': EventList,
-  }
+    'card-title': CardTitle,
+    'data-table': DataTable,
+    'event-editor': EventEditor,
+    'tooltip-button': TooltipButton,
+  },
+
+  props: {
+    locationFilter: { type: Array, default: () => [] },
+  },
+
+  data: () => ({
+
+    editingItemId: undefined,
+
+    filterState: false,
+    filterHasName: '',
+    filterTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
+
+    eventTypes: ['BAPTISM', 'BIRTH', 'DEATH', 'DIVORCE', 'MARRIAGE', 'MILITARY', 'OCCUPATION', 'RESIDENCE'],
+
+    tableHeaders: ['documentscount', 'typetext', 'attendedtext', 'date', 'wasintext', 'actions'],
+
+  }),
+
+  computed: {
+
+    ...mapGetters({
+      getEvents: 'getEvents',
+    }),
+
+    getFilteredItems() {
+
+      if (!(this.filterState || this.locationFilter.length)) { return this.getEvents }
+
+      return this.getEvents
+        .filter(e => this.locationFilter.length ? this.locationFilter.includes(e.wasin || null) : true)
+        .filter(e => this.filterTypes ? this.filterTypes.includes(e.type) : true)
+        .filter(e => !this.filterHasName || ((e.wasintext || '').toLowerCase().includes(this.filterHasName.toLowerCase())) || ((e.attendedtext || '').toLowerCase().includes(this.filterHasName.toLowerCase())))
+
+    },
+
+    filterSubtitleText() { return `showing ${this.getFilteredItems.length} out of ${this.getEvents.length} entries` }
+
+  },
+
+  methods: {
+
+    upsertItem(id) { return this.editingItemId = id },
+
+    isTypeSelected(type) { return this.filterTypes.includes(type) },
+
+    toggleFilterType(type) { return toggleArrayValue(type, this.filterTypes) },
+
+    toggleFilter() {
+
+      this.filterHasName = ''
+      this.filterTypes = this.eventTypes.map(e => e)
+
+      return this.filterState = !this.filterState
+
+    },
+
+  },
 
 }
 </script>

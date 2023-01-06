@@ -6,8 +6,8 @@
             :data="item"
             :disabled="!allowToggle"
             :key="item.id"
-            @clickEdit="clickEdit"
-            @toggle="toggle"
+            @click="click"
+            @close="close"
             v-for="item in getFilteredItems"
         />
     </div>
@@ -45,8 +45,8 @@ export default {
 
   methods: {
 
-    clickEdit(id) { return this.$emit('clickEdit', id) },
-    toggle(id) { return this.$emit('toggle', id) },
+    click(id) { return this.$emit('click', id) },
+    close(id) { return this.$emit('close', id) },
 
   },
 

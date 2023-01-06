@@ -40,8 +40,8 @@
           :allowToggle="true"
           :selected="selectedTags"
           :showSelectedOnly="false"
-          @clickEdit="upsertItem"
-          @toggle="toggleTag"
+          @close="upsertItem"
+          @click="toggleTag"
         />
       </v-card-text>
       <v-card-text>
@@ -122,8 +122,8 @@ export default {
       return this.getEvents.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: 'event',
         id: e.id,
-        tagdetails: `${e.attendedtext || ''} (${e.datelong || ''})`.trim(),
-        taglabel: (e.typetext || ''),
+        tagdetails: '',
+        taglabel: `${e.typetext || ''} ${e.attendedtext || ''} ${e.datelong || ''}`.trim(),
         tagtype: 'event',
       }})
 

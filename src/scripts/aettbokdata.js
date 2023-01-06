@@ -181,6 +181,7 @@ export function processDocuments() {
 
         // relations
 
+        document.events    = extractRelations(document.relations, 'Event', 'from')
         document.persons   = extractRelations(document.relations, 'Person', 'from')
         document.sourcedby = extractRelationSingle(document.relations, 'Source', 'to')
         document.tags      = extractRelations(document.relations, 'Tag', 'to')

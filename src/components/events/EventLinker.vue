@@ -6,9 +6,9 @@
             @link="link"
         />
         <v-chip-group column v-if="linkeditems.length">
-            <person-chip
-                :key="item"
+            <event-chip
                 :id="item"
+                :key="item"
                 @close="unlink"
                 closeicon="mdi-link-off"
                 v-for="item in linkeditems"
@@ -20,34 +20,35 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import EventChip from './EventChip.vue'
 import LinkerAutocomplete from '../common/LinkerAutocomplete.vue'
-import PersonChip from './PersonChip.vue'
 
 export default {
 
-    name: 'PersonLinker',
+    name: 'EventLinker',
 
     components: {
+        'event-chip': EventChip,
         'linker-autocomplete': LinkerAutocomplete,
-        'person-chip': PersonChip,
     },
 
     props: {
         exclude: { type: String, default: null },
-        label: { type: String, default: 'Related Persons' },
+        label: { type: String, default: 'Related Events' },
         linkeditems: { type: Array, default: () => [] },
     },
 
     computed: {
 
         ...mapGetters({
-            getPersons: 'getPersons',
+            getEvents: 'getEvents',
         }),
 
-        getItems() { return this.getPersons.filter(e => e.id !== this.exclude)
+        getItems() { return this.getEvents.filter(e => e.id !== this.exclude)
             .map(e => { return {
-                detail: `(${e.datebirthyear || ''} • ${e.datedeathyear || ''})`,
-                text: `${e.lastname || ''} ${e.firstname || ''}`.trim(),
+                detail: e.dateshort || '',
+                pretail: e.typetext || '',
+                text: e.attendedtext || '',
                 value: e.id,
             }})
         },

@@ -62,7 +62,7 @@ export default {
     filterState: false,
     filterHasText: '',
 
-    tableHeaders: ['sourcedbytext', 'index', 'date', 'actions'],
+    tableHeaders: ['sourcedbytext', 'index', 'date', 'events', 'actions'],
 
   }),
 

@@ -6,10 +6,10 @@
                 <v-autocomplete :items="eventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" />
                 <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
                 <location-picker :selected="item.wasin" @selectedItem="selectedLocation" class="ma-2" label="Location" />
-                <person-linker :persons="item.attended" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
-                <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
+                <person-linker :linkeditems="item.attended" @link="(id) => link(id, item.attended)" @unlink="(id) => unlink(id, item.attended)" class="ma-2" />
+                <document-linker :linkeditems="item.documentedby" @link="(id) => link(id, item.documentedby)" @unlink="(id) => unlink(id, item.documentedby)" class="ma-2" />
                 <v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -112,29 +112,16 @@ export default {
 
     selectedLocation(id) { return this.item.wasin = id },
 
-    linkedDocument(id) {
-        if (this.item.documentedby.includes(id)) { return }
-        return this.item.documentedby.push(id)
-    },
-
-    linkedPerson(id) {
-        if (this.item.attended.includes(id)) { return }
-        return this.item.attended.push(id)
-    },
-
-    unlinkedDocument(id) {
-        let index = this.item.documentedby.findIndex(e => e === id)
-        return index === -1 ? null : this.item.documentedby.splice(index, 1)
-    },
-
-    unlinkedPerson(id) {
-        let index = this.item.attended.findIndex(e => e === id)
-        return index === -1 ? null : this.item.attended.splice(index, 1)
-    },
-
     changeDay(value) { return this.item.day = value },
     changeMonth(value) { return this.item.month = value },
     changeYear(value) { return this.item.year = value },
+
+    link(id, array) { return array.findIndex(e => e === id) === -1 ? array.push(id) : null },
+
+    unlink(id, array) {
+        let index = array.findIndex(e => e === id)
+        return index === -1 ? null : array.splice(index, 1)
+    },
 
     toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
 

@@ -23,9 +23,10 @@
                     </v-col>
                 </v-row>
                 <v-textarea class="ma-2" dense height="100" hide-details label="Notes" outlined v-model="item.notes" />
-                <person-linker :exclude="item.id" :persons="item.hasparents" @linkedPerson="linkedParent" @unlinkedPerson="unlinkedParent" class="ma-2" label="Parents" />
-                <document-linker :documents="item.documentedby" @linkedDocument="linkedDocument" @unlinkedDocument="unlinkedDocument" class="ma-2" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
+                <person-linker :exclude="item.id" :linkeditems="item.hasparents" @link="(id) => link(id, item.hasparents)" @unlink="(id) => unlink(id, item.hasparents)" class="ma-2" label="Parents" />
+                <person-linker :exclude="item.id" :linkeditems="item.haschildren" @link="(id) => link(id, item.haschildren)" @unlink="(id) => unlink(id, item.haschildren)" class="ma-2" label="Children" />
+                <document-linker :linkeditems="item.documentedby" @link="(id) => link(id, item.documentedby)" @unlink="(id) => unlink(id, item.documentedby)" class="ma-2" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -108,24 +109,11 @@ export default {
 
     },
 
-    linkedDocument(id) {
-        if (this.item.documentedby.includes(id)) { return }
-        return this.item.documentedby.push(id)
-    },
+    link(id, array) { return array.findIndex(e => e === id) === -1 ? array.push(id) : null },
 
-    linkedParent(id) {
-        if (this.item.hasparents.includes(id)) { return }
-        return this.item.hasparents.push(id)
-    },
-
-    unlinkedDocument(id) {
-        let index = this.item.documentedby.findIndex(e => e === id)
-        return index === -1 ? null : this.item.documentedby.splice(index, 1)
-    },
-
-    unlinkedParent(id) {
-        let index = this.item.hasparents.findIndex(e => e === id)
-        return index === -1 ? null : this.item.hasparents.splice(index, 1)
+    unlink(id, array) {
+        let index = array.findIndex(e => e === id)
+        return index === -1 ? null : array.splice(index, 1)
     },
 
     toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },

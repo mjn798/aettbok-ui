@@ -1,27 +1,15 @@
 <template>
     <div>
-        <v-autocomplete
-            :filter="filterItems"
+        <linker-autocomplete
             :items="getItems"
-            dense
-            hide-details
-            label="Related Documents"
-            outlined
-            v-model="selectedItem"
-        >
-            <template v-slot:[`item`]="{item}"><small class="mr-2">{{ item.source }}</small>{{ item.text }}</template>
-            <template v-slot:[`selection`]="{item}"><small class="mr-2">{{ item.source }}</small>{{ item.text }}</template>
-            <template v-slot:append-outer>
-                <div class="mt-n3">
-                    <tooltip-button :disabled="selectedItem === null" @click="linkDocument" buttontype="link" />
-                </div>
-            </template>
-        </v-autocomplete>
+            :label="label"
+            @link="link"
+        />
         <document-viewer-list
-            :listofids="documents"
-            @closed="unlinkDocument"
+            :listofids="linkeditems"
+            @closed="unlink"
             closeicon="mdi-link-off"
-            v-if="documents.length"
+            v-if="linkeditems.length"
         />
     </div>
 </template>
@@ -30,24 +18,22 @@
 import { mapGetters } from 'vuex'
 
 import DocumentViewerList from '../documents/DocumentViewerList.vue'
-import TooltipButton from '../common/TooltipButton.vue'
+import LinkerAutocomplete from '../common/LinkerAutocomplete.vue'
 
 export default {
 
     name: 'DocumentLinker',
 
     components: {
-        'document-viewer-list': DocumentViewerList,
-        'tooltip-button': TooltipButton,
+        'document-viewer-list': () => import('../documents/DocumentViewerList.vue'),
+        'linker-autocomplete': LinkerAutocomplete,
     },
 
     props: {
-        documents: { type: Array, default: () => [] },
+        exclude: { type: String, default: null },
+        label: { type: String, default: 'Related Documents' },
+        linkeditems: { type: Array, default: () => [] },
     },
-
-    data: () => ({
-        selectedItem: null,
-    }),
 
     computed: {
 
@@ -55,25 +41,24 @@ export default {
             getDocuments: 'getDocuments',
         }),
 
-        getItems() { return this.getDocuments.map(e => { return { source: e.sourcedbytext, text: e.index, value: e.id }}) },
+        getItems() { return this.getDocuments.filter(e => e.id !== this.exclude)
+            .map(e => {
+                return {
+                    pretail: e.sourcedbytext || '',
+                    text: e.index || '',
+                    value: e.id,
+                }
+            })
+        },
 
     },
 
-  methods: {
+    methods: {
 
-    filterItems(item, queryText, itemText) { return (item.source || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) || (itemText || '').toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) },
+        link(id) { return this.$emit('link', id) },
+        unlink(id) { return this.$emit('unlink', id) },
 
-    linkDocument() {
-        this.$emit('linkedDocument', this.selectedItem)
-        return this.selectedItem = null
     },
-
-    unlinkDocument(id) {
-        this.$emit('unlinkedDocument', id)
-        return this.selectedItem = null
-    },
-
-  },
 
 }
 </script>

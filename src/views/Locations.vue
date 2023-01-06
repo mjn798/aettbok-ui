@@ -3,7 +3,7 @@
     <v-row v-if="showDetails">
       <v-col cols="12"><location-details /></v-col>
       <v-col cols="12"><location-sources-documents /></v-col>
-      <v-col cols="12"><event-list :locationFilter="getLocationPartIds" /></v-col>
+      <v-col cols="12"><events :locationFilter="getLocationPartIds" /></v-col>
     </v-row>
     <v-row v-else>
       <v-col cols="12"><location-list /></v-col>
@@ -14,7 +14,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import EventList from '../components/events/EventList.vue'
+import Events from '../views/Events.vue'
 import LocationDetails from '../components/locations/LocationDetails.vue'
 import LocationList from '../components/locations/LocationList.vue'
 import LocationSourcesDocuments from '../components/locations/LocationSourcesDocuments.vue'
@@ -24,7 +24,7 @@ export default {
   name: 'Locations',
 
   components: {
-    'event-list': EventList,
+    'events': Events,
     'location-details': LocationDetails,
     'location-list': LocationList,
     'location-sources-documents': LocationSourcesDocuments,

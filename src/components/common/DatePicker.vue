@@ -1,54 +1,30 @@
 <template>
     <v-row no-gutters>
-        <v-col cols="12" sm="4">
-            <v-text-field
-                :value="day"
-                @change="changeDay"
-                class="ma-2"
-                clearable
-                dense
-                hide-details
-                hide-spin-buttons
-                label="Day"
-                outlined
-                type="number"
-            />
-        </v-col>
-        <v-col cols="12" sm="4">
-            <v-text-field
-                :value="month"
-                @change="changeMonth"
-                class="ma-2"
-                clearable
-                dense
-                hide-details
-                hide-spin-buttons
-                label="Month"
-                outlined
-                type="number"
-            />
-        </v-col>
-        <v-col cols="12" sm="4">
-            <v-text-field
-                :value="year"
-                @change="changeYear"
-                class="ma-2"
-                clearable
-                dense
-                hide-details
-                hide-spin-buttons
-                label="Year"
-                outlined
-                type="number"
+        <v-col
+            :key="field.label"
+            cols="12"
+            sm="4"
+            v-for="field in getFields"
+        >
+            <date-picker-field
+                :label="field.label"
+                :value="field.value"
+                @change="(value) => change(field.label, field.maxvalue, value)"
             />
         </v-col>
     </v-row>
 </template>
 
 <script>
+import DatePickerField from './DatePickerField.vue'
+
 export default {
 
     name: 'DatePicker',
+
+    components: {
+        'date-picker-field': DatePickerField,
+    },
 
     props: {
         day: { type: Number, default: null },
@@ -56,11 +32,19 @@ export default {
         year: { type: Number, default: null },
     },
 
+    computed: {
+
+        getFields() { return [
+            { label: 'Day',   maxvalue: 31,   value: this.day   },
+            { label: 'Month', maxvalue: 12,   value: this.month },
+            { label: 'Year',  maxvalue: 2500, value: this.year  },
+        ]}
+
+    },
+
     methods: {
 
-        changeDay(value) { return this.$emit('changeDay', Math.min(31, Math.abs(Number(value))) || null) },
-        changeMonth(value) { return this.$emit('changeMonth', Math.min(12, Math.abs(Number(value))) || null) },
-        changeYear(value) { return this.$emit('changeYear', Math.min(2500, Math.abs(Number(value))) || null) },
+        change(label, maxvalue, value) { return this.$emit(`change${label}`, Math.min(maxvalue, Math.abs(Number(value))) || null) },
 
     }
 

@@ -2,15 +2,16 @@
     <v-chip
         :close-icon="closeicon"
         :close="closeicon !== null"
-        :color="getPersonColor"
-        :to="getPersonLink"
-        @click:close="closed(id)"
+        :color="getColor"
+        :to="getItemLink"
+        @click:close="close"
         class="ma-1"
         label
         outlined
+        small
     >
-        {{ getPersonName }}
-        <small class="ml-2">{{ getPersonDates }}</small>
+        {{ getItemLabel }}
+        <small class="ml-2">{{ getItemDates }}</small>
     </v-chip>
 </template>
 
@@ -34,18 +35,18 @@ export default {
             getPerson: 'getPerson',
         }),
 
-        selectedPerson() { return this.getPerson(this.id) },
+        selectedItem() { return this.getPerson(this.id) },
 
-        getPersonColor() { return this.selectedPerson.gendercolor },
-        getPersonDates() { return this.selectedPerson ? `(${(this.longdate ? this.selectedPerson.datebirthshort : this.selectedPerson.datebirthyear) || ''} • ${(this.longdate ? this.selectedPerson.datedeathshort : this.selectedPerson.datedeathyear) || ''})`.trim() : null },
-        getPersonName() { return this.selectedPerson ? `${this.selectedPerson.firstname || ''} ${this.selectedPerson.lastname || ''}`.trim() : null },
-        getPersonLink() { return (this.islink && this.selectedPerson) ? `/persons/${this.selectedPerson.id}` : null }
+        getColor() { return this.selectedItem && this.selectedItem.gendercolor ? this.selectedItem.gendercolor || null : null },
+        getItemDates() { return this.selectedItem ? `(${(this.longdate ? this.selectedItem.datebirthshort : this.selectedItem.datebirthyear) || ''} • ${(this.longdate ? this.selectedItem.datedeathshort : this.selectedItem.datedeathyear) || ''})`.trim() : null },
+        getItemLabel() { return this.selectedItem ? `${this.selectedItem.firstname || ''} ${this.selectedItem.lastname || ''}`.trim() : null },
+        getItemLink() { return this.islink && this.selectedItem ? `/persons/${this.selectedItem.id}` : null },
 
     },
 
     methods: {
 
-        closed(id) { return this.$emit('closed', id) },
+        close() { return this.$emit('close', this.id) },
 
     }
 

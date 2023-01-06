@@ -1,13 +1,16 @@
 <template>
     <v-chip
-        :to="getLocationLink"
+        :close-icon="closeicon"
+        :close="closeicon !== null"
+        :to="getItemLink"
+        @click:close="close"
         class="ma-1"
         color="grey darken-4"
         label
         outlined
         small
     >
-        {{ getLocationName }}
+        {{ getItemLabel }}
     </v-chip>
 </template>
 
@@ -19,6 +22,7 @@ export default {
     name: 'LocationChip',
 
     props: {
+        closeicon: { type: String, default: null },
         id: { type: String, default: null },
     },
 
@@ -30,8 +34,14 @@ export default {
 
         selectedItem() { return this.getLocation(this.id) },
 
-        getLocationName() { return this.selectedItem ? this.selectedItem.location || 'n/a' : 'n/a' },
-        getLocationLink() { return this.selectedItem ? `/locations/${this.selectedItem.id}` || null : null },
+        getItemLabel() { return this.selectedItem && this.selectedItem.location ? this.selectedItem.location || 'n/a' : 'n/a' },
+        getItemLink() { return this.selectedItem ? `/locations/${this.selectedItem.id}` : null },
+
+    },
+
+    methods: {
+
+        close() { return this.$emit('close', this.id) }
 
     },
 

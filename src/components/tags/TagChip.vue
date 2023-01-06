@@ -6,8 +6,8 @@
         :disabled="disabled"
         :outlined="!active"
         :style="active ? 'border: 1px solid white' : ''"
-        @click:close="clickEdit"
-        @click="toggle"
+        @click:close="close"
+        @click="click"
         class="ma-1"
         close-icon="mdi-pencil"
         small
@@ -30,8 +30,8 @@ export default {
 
   methods: {
       
-      clickEdit() { return this.$emit('clickEdit', this.data.id) },
-      toggle() { return this.$emit('toggle', this.data.id) },
+      click() { return this.$emit('click', this.data.id) },
+      close() { return this.$emit('close', this.data.id) },
 
   },
 

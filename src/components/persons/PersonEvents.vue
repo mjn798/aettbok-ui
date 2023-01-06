@@ -15,7 +15,7 @@
                         <icon :icontype="`event-${(event.type || '').toLocaleLowerCase()}`" class="ma-2" />
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-subtitle class="ma-2" v-if="event.dateFull || event.wasin">
+                        <v-list-item-subtitle class="ma-2" v-if="event.date || event.wasin">
                             {{ getDateLocationText(event) }}
                             <location-chip :id="event.wasin" v-if="event.wasin" />
                         </v-list-item-subtitle>
@@ -38,6 +38,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { compareStrings } from '../../scripts/aettbok'
 
 import CardTitle from '../common/CardTitle.vue'
 import DocumentViewerList from '../documents/DocumentViewerList.vue'
@@ -86,7 +87,7 @@ export default {
             events = JSON.parse(JSON.stringify(events))
             events.forEach(e => { if (!e.attended.includes(this.selectedPerson.id) && e.type === 'BIRTH') { e.type = 'CHILDBIRTH' } })
 
-            return events
+            return events.sort((a, b) => compareStrings(a.type, b.type)).sort((a, b) => compareStrings(a.date, b.date))
 
         }
 

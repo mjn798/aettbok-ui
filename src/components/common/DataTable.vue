@@ -1,6 +1,5 @@
 <template>
     <div>
-        <event-editor :id="editingEventId" @close="upsertEvent(undefined)" />
         <v-data-table
             :footer-props="{ 'items-per-page-options': [15, 25, 50, -1] }"
             :headers="getTableHeaders"
@@ -13,6 +12,7 @@
             <template v-slot:[`item.datedeath`]="{item}">{{ item.datedeathlong }}</template>
             <template v-slot:[`item.deathlocationtext`]="{item}"><location-chip :id="item.deathlocation" v-if="item.deathlocation" /></template>
             <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
+            <template v-slot:[`item.events`]="{item}"><event-chip :id="event" :key="event" allowOpen v-for="event in item.events" /></template>
             <template v-slot:[`item.location`]="{item}"><location-chip :id="item.id" v-if="item.id" /></template>
             <template v-slot:[`item.sourcedbytext`]="{item}"><source-chip :id="item.sourcedby" /></template>
             <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
@@ -39,7 +39,7 @@
                 <location-chip :id="item.id" v-if="item.id && item.tagtype === 'location'" />
                 <person-chip :id="item.id" islink v-if="item.id && item.tagtype === 'person'" />
                 <source-chip :id="item.id" v-if="item.id && item.tagtype === 'source'" />
-                <div class="mx-2" v-if="item.id && item.tagtype === 'event'">{{ item.taglabel }} <tooltip-button @click="upsertEvent(item.id)" buttontype="edit" small /></div>
+                <event-chip :id="item.id" allowOpen v-if="item.id && item.tagtype === 'event'" />
             </template>
         </v-data-table>
     </div>
@@ -48,7 +48,7 @@
 <script>
 import DocumentViewer from '../documents/DocumentViewer.vue'
 import DocumentViewerList from '../documents/DocumentViewerList.vue'
-import EventEditor from '../events/EventEditor.vue'
+import EventChip from '../events/EventChip.vue'
 import Icon from '../common/Icon.vue'
 import LocationChip from '../locations/LocationChip.vue'
 import PersonChip from '../persons/PersonChip.vue'
@@ -67,7 +67,7 @@ export default {
     components: {
         'document-viewer': DocumentViewer,
         'document-viewer-list': DocumentViewerList,
-        'event-editor': EventEditor,
+        'event-chip': EventChip,
         'icon': Icon,
         'location-chip': LocationChip,
         'person-chip': PersonChip,
@@ -76,8 +76,6 @@ export default {
     },
 
     data: () => ({
-
-        editingEventId: undefined,
 
         tableHeaders: [
 
@@ -100,6 +98,7 @@ export default {
             { value: 'index', text: 'Document Index', sortable: true },
             { value: 'attendedtext', text: 'Attendees', sortable: false },
             { value: 'date', text: 'Date', sortable: true },
+            { value: 'events', text: 'Events', sortable: false },
             { value: 'wasintext', text: 'Location', sortable: true },
             { value: 'containedintext', text: 'Contained in', sortable: true },
             { value: 'storedintext', text: 'Stored in', sortable: true },
@@ -123,8 +122,6 @@ export default {
 
         edit(id) { return this.$emit('edit', id) },
         view(id) { return this.$emit('view', id) },
-
-        upsertEvent(id) { return this.editingEventId = id },
 
         getPersonIcon(person) { return `person-${person.gender || 'u'}${person.alive ? 'a' : 'd'}` },
 

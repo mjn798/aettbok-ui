@@ -6,9 +6,10 @@
                 <source-picker :selected="item.sourcedby" @selectedItem="selectedSource" class="ma-2" label="Source" />
                 <v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" />
                 <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
-                <v-textarea class="ma-2" dense height="500" hide-details label="Content" outlined v-model="item.content" />
-                <person-linker :persons="item.persons" @linkedPerson="linkedPerson" @unlinkedPerson="unlinkedPerson" class="ma-2" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @toggle="toggleTag" allowToggle class="ma-2 mt-8" />
+                <v-textarea class="ma-2" dense height="400" hide-details label="Content" outlined v-model="item.content" />
+                <person-linker :linkeditems="item.persons" @link="(id) => link(id, item.persons)" @unlink="(id) => unlink(id, item.persons)" class="ma-2" />
+                <event-linker :linkeditems="item.events" @link="(id) => link(id, item.events)" @unlink="(id) => unlink(id, item.events)" class="ma-2" />
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -21,6 +22,7 @@ import * as aettbok from '../../scripts/aettbok'
 
 import CardActions from '../common/CardActions.vue'
 import DatePicker from '../common/DatePicker.vue'
+import EventLinker from '../events/EventLinker.vue'
 import PersonLinker from '../persons/PersonLinker.vue'
 import SourcePicker from '../sources/SourcePicker.vue'
 import TagChips from '../tags/TagChips.vue'
@@ -32,6 +34,7 @@ export default {
     components: {
         'card-actions': CardActions,
         'date-picker': DatePicker,
+        'event-linker': EventLinker,
         'person-linker': PersonLinker,
         'source-picker': SourcePicker,
         'tag-chips': TagChips,
@@ -84,7 +87,6 @@ export default {
         if (!this.item.content)   { this.item.content = null }
         if (!this.item.date)      { this.item.date = null }
         if (!this.item.index)     { this.item.index = null }
-        if (!this.item.persons)   { this.item.persons = null }
         if (!this.item.sourcedby) { this.item.sourcedby = null }
         if (!this.item.day)       { this.item.day = null }
         if (!this.item.month)     { this.item.month = null }
@@ -100,19 +102,16 @@ export default {
 
     selectedSource(id) { return this.item.sourcedby = id },
 
-    linkedPerson(id) {
-        let index = this.item.persons.findIndex(e => e === id)
-        return index === -1 ? this.item.persons.push(id) : null
-    },
-
-    unlinkedPerson(id) {
-        let index = this.item.persons.findIndex(e => e === id)
-        return index === -1 ? null : this.item.persons.splice(index, 1)
-    },
-
     changeDay(value) { return this.item.day = value },
     changeMonth(value) { return this.item.month = value },
     changeYear(value) { return this.item.year = value },
+
+    link(id, array) { return array.findIndex(e => e === id) === -1 ? array.push(id) : null },
+
+    unlink(id, array) {
+        let index = array.findIndex(e => e === id)
+        return index === -1 ? null : array.splice(index, 1)
+    },
 
     toggleTag(id) { return aettbok.toggleArrayValue(id, this.item.tags) },
 
@@ -127,6 +126,7 @@ export default {
         return this.item = {
             content: null,
             day: null,
+            events: [],
             id: null,
             index: null,
             month: null,
