@@ -14,7 +14,7 @@
             <template v-slot:[`item.documentscount`]="{item}"><document-viewer :listofids="item.documentedby" /></template>
             <template v-slot:[`item.events`]="{item}"><event-chip :id="event" :key="event" allowOpen v-for="event in item.events" /></template>
             <template v-slot:[`item.location`]="{item}"><location-chip :id="item.id" v-if="item.id" /></template>
-            <template v-slot:[`item.sourcedbytext`]="{item}"><source-chip :id="item.sourcedby" /></template>
+            <template v-slot:[`item.sourcedbytext`]="{item}"><source-chip :id="item.sourcedby" allowOpen v-if="item.sourcedby" /></template>
             <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
             <template v-slot:[`item.tagtype`]="{item}"><icon :icontype="item.icon" /></template>
             <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
@@ -38,7 +38,7 @@
                 <document-viewer-list :listofids="[item.id]" v-if="item.id && item.tagtype === 'document'" />
                 <location-chip :id="item.id" v-if="item.id && item.tagtype === 'location'" />
                 <person-chip :id="item.id" islink v-if="item.id && item.tagtype === 'person'" />
-                <source-chip :id="item.id" v-if="item.id && item.tagtype === 'source'" />
+                <source-chip :id="item.id" allowOpen v-if="item.id && item.tagtype === 'source'" />
                 <event-chip :id="item.id" allowOpen v-if="item.id && item.tagtype === 'event'" />
             </template>
         </v-data-table>
