@@ -105,6 +105,7 @@ icons.set('source', { icon: 'mdi-book-multiple', class: null, color: null })
 icons.set('source-new', { icon: 'mdi-book-plus-multiple', class: null, color: null })
 icons.set('tag-new', { icon: 'mdi-tag-plus', class: null, color: null })
 icons.set('unlink', { icon: 'mdi-link-off', class: null, color: null })
+icons.set('view', { icon: 'mdi-eye', class: null, color: null })
 
 export default {
 

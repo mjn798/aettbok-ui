@@ -10,12 +10,14 @@
     <tooltip-button
       :buttontype="`${titletype}-new`"
       @click="clickedAction"
-      v-if="getTitletype"
+      v-if="getTitletype && getRoleIsEditor"
     />
   </v-card-title>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import TooltipButton from './TooltipButton.vue'
 
 const titletypes = new Map()
@@ -44,6 +46,10 @@ export default {
   },
 
   computed: {
+
+    ...mapGetters({
+      getRoleIsEditor: 'getRoleIsEditor',
+    }),
 
     getFilterButton() { return this.filterIconState ? 'filter-remove' : 'filter-normal' },
     getTitletype() { return titletypes.get(this.titletype) || titletypes.get('default') },

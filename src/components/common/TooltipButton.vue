@@ -108,7 +108,7 @@ tooltips.set('showing-status-u', { tooltip: 'Showing dead and alive', color: col
 tooltips.set('source-new', { tooltip: 'New Source', color: null })
 tooltips.set('tag-new', { tooltip: 'New Tag', color: null })
 tooltips.set('unlink', { tooltip: 'Unlink', color: null })
-
+tooltips.set('view', { tooltip: 'View', color: null })
 
 export default {
 

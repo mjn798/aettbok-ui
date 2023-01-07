@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="getRoleIsEditor">
         <location-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <v-autocomplete
             :items="getItems"
@@ -19,6 +19,9 @@
                 </div>
             </template>
         </v-autocomplete>
+    </div>
+    <div v-else>
+        {{ getLabel }}
     </div>
 </template>
 
@@ -49,8 +52,12 @@ export default {
     computed: {
 
         ...mapGetters({
+            getLocation: 'getLocation',
             getLocations: 'getLocations',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
+
+        getLabel() { return (this.getLocation(this.selected) || { location: '' }).location },
 
         getItems() { return this.getLocations.filter(e => e.id !== this.exclude).map(e => { return { text: e.location, type: (e.locationtypetext || ''), value: e.id } }) },
 

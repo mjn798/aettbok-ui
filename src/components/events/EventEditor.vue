@@ -3,13 +3,21 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-autocomplete :items="eventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" />
+
+                <v-autocomplete :items="eventTypes" class="ma-2" dense hide-details label="Event Type" outlined v-model="item.type" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.type">{{ item.typetext }}</div>
+
                 <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
                 <location-picker :selected="item.wasin" @selectedItem="selectedLocation" class="ma-2" label="Location" />
                 <person-linker :linkeditems="item.attended" @link="(id) => link(id, item.attended)" @unlink="(id) => unlink(id, item.attended)" class="ma-2" />
                 <document-linker :linkeditems="item.documentedby" @link="(id) => link(id, item.documentedby)" @unlink="(id) => unlink(id, item.documentedby)" class="ma-2" />
-                <v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
+
+                <v-textarea class="ma-2" dense height="100" hide-details label="Comment" outlined v-model="item.comment" v-if="getRoleIsEditor" />
+                <div class="ma-2 my-8" style="white-space: pre-line" v-else-if="item.comment">{{ item.comment }}</div>
+
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" v-if="getRoleIsEditor" />
+                <tag-chips :selected="item.tags" class="ma-2 mt-8" v-else-if="item.tags" />
+
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -65,11 +73,12 @@ export default {
 
         ...mapGetters({
             getEvent: 'getEvent',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         showDialog() { return this.id !== undefined },
 
-        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Event' },
+        getDialogTitle() { return (!this.getRoleIsEditor ? 'View ' : this.isNewDialog ? 'New ' : 'Edit ') + 'Event' },
 
         isNewDialog() { return !this.id },
         isSaveDisabled() { return !(this.item && this.item.type) },

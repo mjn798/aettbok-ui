@@ -4,7 +4,7 @@
         <v-card-title>
             <div>{{ selectedItem.location }}</div>
             <v-spacer/>
-            <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="location-edit" />
+            <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="location-edit" v-if="getRoleIsEditor" />
         </v-card-title>
         <v-card-text>
             {{ selectedItem.locationtypetext }}
@@ -58,6 +58,7 @@ export default {
 
         ...mapGetters({
             getLocation: 'getLocation',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         selectedItem() { return this.getLocation(this.$route.params.id) },

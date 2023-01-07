@@ -65,6 +65,9 @@ export default new Vuex.Store({
 
     getAccessToken: (state) => state.acccessToken,
 
+    getRoleIsEditor: (state) => true,
+    // getRoleIsEditor: (state) => false,
+
     /* LOADING STATUS */
 
     getLoadingStatus: (state) => { return { total: 7, loaded: state.loadedDocuments + state.loadedEvents + state.loadedLocations + state.loadedLocationTypes + state.loadedPersons + state.loadedSources + state.loadedTags }},

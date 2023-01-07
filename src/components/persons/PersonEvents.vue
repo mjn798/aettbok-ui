@@ -29,7 +29,9 @@
                             <document-viewer-list :listofids="event.documentedby" />
                         </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action class="text-right align-self-start"><tooltip-button @click="upsertItem(event.id)" buttontype="edit" small /></v-list-item-action>
+                    <v-list-item-action class="text-right align-self-start" v-if="getRoleIsEditor">
+                        <tooltip-button @click="upsertItem(event.id)" buttontype="edit" small />
+                    </v-list-item-action>
                 </v-list-item>
             </v-card>
         </v-card-text>
@@ -74,6 +76,7 @@ export default {
             getEvents: 'getEvents',
             getEventsForPerson: 'getEventsForPerson',
             getPerson: 'getPerson',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         selectedPerson() { return this.getPerson(this.$route.params.id) },

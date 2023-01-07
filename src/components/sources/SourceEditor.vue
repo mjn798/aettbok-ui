@@ -3,12 +3,22 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-text-field class="ma-2" dense hide-details label="Source" outlined v-model="item.source" />
+
+                <v-text-field class="ma-2" dense hide-details label="Source" outlined v-model="item.source" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.source">{{ item.source }}</div>
+
                 <source-picker class="ma-2" :exclude="item.id" :selected="item.containedin" @selectedItem="selectedContainedIn" label="Contained in" />
                 <location-picker class="ma-2" :selected="item.storedin" @selectedItem="selectedLocation" label="Stored in" />
-                <v-text-field class="ma-2" dense hide-details label="Author" outlined v-model="item.author" />
-                <v-text-field class="ma-2" dense hide-details label="Link" outlined v-model="item.link" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
+
+                <v-text-field class="ma-2" dense hide-details label="Author" outlined v-model="item.author" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.author">{{ item.author }}</div>
+
+                <v-text-field class="ma-2" dense hide-details label="Link" outlined v-model="item.link" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.link">{{ item.link }}</div>
+
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" v-if="getRoleIsEditor" />
+                <tag-chips :selected="item.tags" class="ma-2 mt-8" v-else-if="item.tags" />
+
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -48,12 +58,13 @@ export default {
     computed: {
 
         ...mapGetters({
+            getRoleIsEditor: 'getRoleIsEditor',
             getSource: 'getSource',
         }),
 
         showDialog() { return this.id !== undefined },
 
-        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Source' },
+        getDialogTitle() { return (!this.getRoleIsEditor ? 'View ' : this.isNewDialog ? 'New ' : 'Edit ') + 'Source' },
 
         isNewDialog() { return !this.id },
         isSaveDisabled() { return !(this.item && this.item.source && this.item.source.length) },

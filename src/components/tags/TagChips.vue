@@ -2,7 +2,7 @@
     <div>
         <tag-chip
             :active="selected.includes(item.id)"
-            :allowEdit="allowEdit && allowToggle"
+            :allowEdit="allowEdit && allowToggle && getRoleIsEditor"
             :data="item"
             :disabled="!allowToggle"
             :key="item.id"
@@ -37,6 +37,7 @@ export default {
 
       ...mapGetters({
           getTags: 'getTags',
+          getRoleIsEditor: 'getRoleIsEditor',
       }),
 
       getFilteredItems() { return this.showSelectedOnly ? this.getTags.filter(e => this.selected.includes(e.id)) : this.getTags },

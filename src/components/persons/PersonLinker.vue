@@ -4,13 +4,15 @@
             :items="getItems"
             :label="label"
             @link="link"
+            v-if="getRoleIsEditor"
         />
+        <div v-if="!getRoleIsEditor">{{ label }}</div>
         <v-chip-group column v-if="linkeditems.length">
             <person-chip
-                :key="item"
+                :closeicon="getRoleIsEditor ? 'mdi-link-off' : null"
                 :id="item"
+                :key="item"
                 @close="unlink"
-                closeicon="mdi-link-off"
                 v-for="item in linkeditems"
             />
         </v-chip-group>
@@ -42,6 +44,7 @@ export default {
 
         ...mapGetters({
             getPersons: 'getPersons',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         getItems() { return this.getPersons.filter(e => e.id !== this.exclude)

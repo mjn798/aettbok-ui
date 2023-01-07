@@ -110,7 +110,7 @@ function getAllDates(day, month, year, item, type = null) {
 
 // format date to locale with different options
 
-function getFormattedDate(day, month, year, monthLength = 'short') {
+export function getFormattedDate(day, month, year, monthLength = 'short') {
 
     if (!day && !month && !year) { return null }
 

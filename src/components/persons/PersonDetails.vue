@@ -5,7 +5,7 @@
             <icon :icontype="getPersonIcon" />
             <div class="ml-2">{{ selectedItem.firstname }}<span class="ml-2" style="font-weight: bold; text-transform: uppercase;">{{ selectedItem.lastname }}</span></div>
             <v-spacer/>
-            <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="person-edit" />
+            <tooltip-button @click="upsertItem(selectedItem.id)" buttontype="person-edit" v-if="getRoleIsEditor" />
         </v-card-title>
         <v-card-text v-if="selectedItem.datebirth || selectedItem.birthlocation || selectedItem.datedeath || selectedItem.deathlocation">
             <div class="mb-2" v-if="selectedItem.datebirthlong || selectedItem.birthlocation">
@@ -53,6 +53,7 @@ export default {
 
     ...mapGetters({
         getPerson: 'getPerson',
+        getRoleIsEditor: 'getRoleIsEditor',
     }),
 
     selectedItem() { return this.getPerson(this.$route.params.id) },

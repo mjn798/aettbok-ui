@@ -4,11 +4,13 @@
             :items="getItems"
             :label="label"
             @link="link"
+            v-if="getRoleIsEditor"
         />
+        <div v-if="!getRoleIsEditor">{{ label }}</div>
         <document-viewer-list
+            :closeicon="getRoleIsEditor ? 'mdi-link-off' : null"
             :listofids="linkeditems"
             @closed="unlink"
-            closeicon="mdi-link-off"
             v-if="linkeditems.length"
         />
     </div>
@@ -17,7 +19,6 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import DocumentViewerList from '../documents/DocumentViewerList.vue'
 import LinkerAutocomplete from '../common/LinkerAutocomplete.vue'
 
 export default {
@@ -39,6 +40,7 @@ export default {
 
         ...mapGetters({
             getDocuments: 'getDocuments',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         getItems() { return this.getDocuments.filter(e => e.id !== this.exclude)

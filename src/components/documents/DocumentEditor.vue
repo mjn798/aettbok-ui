@@ -3,13 +3,23 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
+                
                 <source-picker :selected="item.sourcedby" @selectedItem="selectedSource" class="ma-2" label="Source" />
-                <v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" />
+
+                <v-text-field class="ma-2" dense hide-details label="Document Index" outlined v-model="item.index" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.index">{{ item.index }}</div>
+                
                 <date-picker :day="item.day" :month="item.month" :year="item.year" @changeDay="changeDay" @changeMonth="changeMonth" @changeYear="changeYear" />
-                <v-textarea class="ma-2" dense height="400" hide-details label="Content" outlined v-model="item.content" />
+                
+                <v-textarea class="ma-2" dense height="400" hide-details label="Content" outlined v-model="item.content" v-if="getRoleIsEditor" />
+                <div class="ma-2 my-8" style="white-space: pre-line" v-else-if="item.content">{{ item.content }}</div>
+                
                 <person-linker :linkeditems="item.persons" @link="(id) => link(id, item.persons)" @unlink="(id) => unlink(id, item.persons)" class="ma-2" />
                 <event-linker :linkeditems="item.events" @link="(id) => link(id, item.events)" @unlink="(id) => unlink(id, item.events)" class="ma-2" />
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
+                
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" v-if="getRoleIsEditor" />
+                <tag-chips :selected="item.tags" class="ma-2 mt-8" v-else-if="item.tags" />
+
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -54,12 +64,13 @@ export default {
 
         ...mapGetters({
             getDocument: 'getDocument',
+            getRoleIsEditor: 'getRoleIsEditor',
             getSources: 'getSources',
         }),
 
         showDialog() { return this.id !== undefined },
 
-        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Document' },
+        getDialogTitle() { return (!this.getRoleIsEditor ? 'View ' : this.isNewDialog ? 'New ' : 'Edit ') + 'Document' },
 
         isNewDialog() { return !this.id },
         isSaveDisabled() { return false },

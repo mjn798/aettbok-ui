@@ -4,7 +4,10 @@
         <v-card>
             <v-card-title>{{ getDialogTitle }}</v-card-title>
             <v-card-text>
-                <v-text-field class="ma-2" dense hide-details label="Location" outlined v-model="item.location" />
+
+                <v-text-field class="ma-2" dense hide-details label="Location" outlined v-model="item.location" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else>{{ item.location }}</div>
+
                 <v-autocomplete
                     :items="getLocationTypes"
                     class="ma-2"
@@ -15,6 +18,7 @@
                     item-value="id"
                     label="Type"
                     outlined
+                    v-if="getRoleIsEditor"
                     v-model="item.locationtype"
                 >
                     <template v-slot:append-outer>
@@ -23,12 +27,22 @@
                         </div>
                     </template>
                 </v-autocomplete>
-                <location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" class="ma-2" label="Part of" />
-                <v-row no-gutters>
+                <div class="ma-2" v-else-if="item.locationtype">{{ item.locationtypetext }}</div>
+
+                <location-picker :exclude="item.id" :selected="item.partof" @selectedItem="selectedLocation" class="ma-2" label="Part of" v-if="getRoleIsEditor" />
+                <div class="ma-2" v-else-if="item.partof">in {{ item.partofresolved }}</div>
+
+                <v-row no-gutters v-if="getRoleIsEditor">
                     <v-col cols="12" sm="6"><v-text-field class="ma-2" dense hide-details label="Latitude" outlined v-model="item.latitude" /></v-col>
                     <v-col cols="12" sm="6"><v-text-field class="ma-2" dense hide-details label="Longitude" outlined v-model="item.longitude" /></v-col>
                 </v-row>
-                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" />
+                <v-row no-gutters v-else-if="item.latitude || item.longitude">
+                    <v-col>{{ item.latitude }} {{ item.longitude }}</v-col>
+                </v-row>
+
+                <tag-chips :selected="item.tags" :showSelectedOnly="false" @click="toggleTag" allowToggle class="ma-2 mt-8" v-if="getRoleIsEditor" />
+                <tag-chips :selected="item.tags" class="ma-2 mt-8" v-else-if="item.tags" />
+
             </v-card-text>
             <card-actions :allowRemove="!isNewDialog" :isSaveDisabled="isSaveDisabled" @close="close" @remove="remove" @save="save" />
         </v-card>
@@ -74,11 +88,12 @@ export default {
         ...mapGetters({
             getLocation: 'getLocation',
             getLocationTypes: 'getLocationTypes',
+            getRoleIsEditor: 'getRoleIsEditor',
         }),
 
         showDialog() { return this.id !== undefined },
 
-        getDialogTitle() { return (this.isNewDialog ? 'New ' : 'Edit ') + 'Location' },
+        getDialogTitle() { return (!this.getRoleIsEditor ? 'View ' : this.isNewDialog ? 'New ' : 'Edit ') + 'Location' },
 
         isNewDialog() { return !this.id },
         isSaveDisabled() { return !(this.item && this.item.location && this.item.location.length) },

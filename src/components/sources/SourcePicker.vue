@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="getRoleIsEditor">
         <source-editor :id="editingItemId" @close="upsertItem(undefined)" />
         <v-autocomplete
             :items="getItems"
@@ -17,6 +17,9 @@
                 </div>
             </template>
         </v-autocomplete>
+    </div>
+    <div v-else>
+        {{ getLabel }}
     </div>
 </template>
 
@@ -47,8 +50,12 @@ export default {
     computed: {
 
         ...mapGetters({
+            getRoleIsEditor: 'getRoleIsEditor',
+            getSource: 'getSource',
             getSources: 'getSources',
         }),
+
+        getLabel() { return (this.getSource(this.selected) || { source: '' }).source },
 
         getItems() { return this.getSources.filter(e => e.id !== this.exclude).map(e => { return { text: e.source, value: e.id } }) },
 
