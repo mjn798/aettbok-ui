@@ -1,6 +1,10 @@
 <template>
     <v-card>
-        <v-card-title>Family</v-card-title>
+        <person-editor :id="editingItemId" @close="upsertItem(undefined)" />
+        <card-title
+            @click="upsertItem(null)"
+            titletype="person"
+        />
         <v-container>
             <v-row>
                 <v-col cols="12" sm="6">
@@ -44,6 +48,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import CardTitle from '../common/CardTitle.vue'
+import PersonEditor from './PersonEditor.vue'
 import PersonQuickCard from './PersonQuickCard.vue'
 
 export default {
@@ -51,8 +57,16 @@ export default {
   name: 'PersonFamily',
 
   components: {
+    'card-title': CardTitle,
+    'person-editor': PersonEditor,
     'person-quickcard': PersonQuickCard,
   },
+
+  data: () => ({
+
+    editingItemId: undefined,
+
+  }),
 
   computed: {
 
@@ -146,9 +160,15 @@ export default {
             half: Array.from(siblingsHalf).filter(e => e.id !== this.selectedPerson.id).sort((a, b) => (a.birth || '').localeCompare(b.birth || '')),
         }
 
-    }
+    },
 
   },
+
+    methods: {
+
+        upsertItem(id) { return this.editingItemId = id },
+
+    },
 
 }
 </script>

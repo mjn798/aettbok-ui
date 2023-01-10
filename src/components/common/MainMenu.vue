@@ -9,25 +9,8 @@
           {{ item.text }}
         </v-tab>
         <v-spacer/>
-        <v-menu bottom left v-if="isDataLoaded">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              class="ma-2"
-              icon
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item>
-              <v-list-item-content>
-                <v-btn @click="logout" depressed text>Logout</v-btn>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" />
+        <tooltip-button @click="logout" class="ma-2" buttontype="logout" />
     </v-tabs>
 </template>
 
@@ -35,9 +18,15 @@
 import { mapGetters, mapActions } from 'vuex'
 import * as authentication from '../../scripts/authentication'
 
+import TooltipButton from './TooltipButton.vue'
+
 export default {
 
   name: 'MainMenu',
+
+  components: {
+    'tooltip-button': TooltipButton,
+  },
 
   data: () => ({
 
@@ -57,8 +46,13 @@ export default {
   computed: {
 
     ...mapGetters({
-      isDataLoaded: 'isDataLoaded'
+      getRoleIsAdministrator: 'getRoleIsAdministrator',
+      getRoleIsEditor: 'getRoleIsEditor',
+      isDataLoaded: 'isDataLoaded',
+      getAccessToken: 'getAccessToken',
     }),
+
+    getEditMode() { return this.getRoleIsEditor ? 'edit-mode-on' : 'edit-mode-off' },
 
   },
 
@@ -66,7 +60,13 @@ export default {
 
     ...mapActions({
       setAccessToken: 'setAccessToken',
+      toggleRoleIsEditor: 'toggleRoleIsEditor',
     }),
+
+    toggleEditor() {
+      console.log(this.getAccessToken)
+      return this.toggleRoleIsEditor()
+    },
 
     logout() {
 

@@ -19,10 +19,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import * as authentication from './scripts/authentication'
 
 import Dataloader from './views/Dataloader.vue'
-import Login from './components/common/Login.vue'
+import Login from './views/Login.vue'
 import MainMenu from './components/common/MainMenu.vue'
 
 export default {

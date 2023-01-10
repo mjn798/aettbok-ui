@@ -150,6 +150,7 @@ export default {
                 documentedby: [],
                 firstname: null,
                 gender: 'u',
+                haschildren: [],
                 hasparents: [],
                 lastname: null,
                 notes: null,

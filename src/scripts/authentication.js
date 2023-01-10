@@ -8,19 +8,45 @@ const firebaseConfig = { apiKey: process.env.VUE_APP_FIREBASE_API_KEY, authDomai
 
 firebase.initializeApp(firebaseConfig)
 
-// if access token changes (i.e. login) persist it in store
+// if authentication state changes, log the user information
 
 firebaseAuth.getAuth().onAuthStateChanged(user => {
-    if (user) {
-        console.debug('authentication:existingUser', user.email)
-        tokenRefresh()
-        return store.dispatch('setAccessToken', user.accessToken)
-    } else {
-        console.warn('authentication:user does not exist')
-    }
+
+    if (user) { return  console.debug('authentication:stateChange:existingUser', user.email) }
+    return console.debug('authentication:stateChange:user does not exist')
+
 })
 
+// if access token changes, persist it in firebaseUserToken
 
+firebaseAuth.getAuth().onIdTokenChanged(token => {
+
+    if (!token) { return store.dispatch('setAccessToken', null) }
+
+    token.getIdTokenResult()
+    .then(result => {
+        console.debug('authentication:tokenChange:received new token:expirationTime', result.expirationTime)
+        store.dispatch('setAccessToken', result)
+    })
+    .catch(error => console.error('authentication:tokenChange', error))
+
+})
+
+// create a new user with username and password
+
+export function createAccountWithEmailAndPassword(email, password) {
+    return new Promise((resolve, reject) => {
+
+        console.debug('authentication:createAccount', email)
+
+        let auth = firebaseAuth.getAuth()
+
+        return firebaseAuth.createUserWithEmailAndPassword(auth, email, password)
+        .then(credential => resolve(credential))
+        .catch(error => reject(error))
+    
+    })
+}
 
 // login with username and password
 
@@ -31,7 +57,7 @@ export function login(username, password) {
 
         let auth = firebaseAuth.getAuth()
 
-        // persist authentication in local browser
+        // persist authentication in browser
 
         firebaseAuth.setPersistence(auth, firebaseAuth.browserLocalPersistence)
         .then(() => {
@@ -39,7 +65,31 @@ export function login(username, password) {
             firebaseAuth.signInWithEmailAndPassword(auth, username, password)
             .then(() => resolve(console.debug('authentication:success', username)))
             .catch(error => reject(error))
-        
+
+        })
+        .catch(error => reject(error))
+
+    })
+}
+
+// login with Google Account
+
+export function loginWithGoogle() {
+    return new Promise((resolve, reject) => {
+
+        let auth = firebaseAuth.getAuth()
+
+        const googleProvider = new firebaseAuth.GoogleAuthProvider()
+
+        // persist authentication in browser
+
+        firebaseAuth.setPersistence(auth, firebaseAuth.browserLocalPersistence)
+        .then(() => {
+
+            firebaseAuth.signInWithPopup(auth, googleProvider)
+            .then(() => resolve(console.debug('authentication:success:GoogleAccount')))
+            .catch(error => reject(error))
+
         })
         .catch(error => reject(error))
 
@@ -60,24 +110,4 @@ export function logout() {
         .catch(error => reject(error))
 
     })
-}
-
-// refresh Access Tokens on regular interval
-
-function tokenRefresh() {
-
-    // regularly check the access token for expiration and require a new one if needed
-
-    return setTimeout(function() {
-
-        firebaseAuth.getAuth().currentUser.getIdToken()
-        .then(token => {
-            console.debug('authentication:tokenRefresh')
-            store.dispatch('setAccessToken', token)
-        })
-        .catch(error => console.error('authentication:tokenRefresh:error', error))
-
-        return tokenRefresh()
-    }, 4 * 60 * 1000)
-
 }

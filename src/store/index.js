@@ -11,7 +11,8 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    acccessToken: null,
+    accessToken: null,
+    roleIsEditor: false,
 
     /* LOADING STATUS */
 
@@ -63,10 +64,10 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    getAccessToken: (state) => state.acccessToken,
+    getAccessToken: (state) => state.accessToken ? state.accessToken.token : null,
 
-    getRoleIsEditor: (state) => true,
-    // getRoleIsEditor: (state) => false,
+    getRoleIsAdministrator: (state) => false,
+    getRoleIsEditor: (state) => state.roleIsEditor,
 
     /* LOADING STATUS */
 
@@ -152,7 +153,9 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    setAccessToken({ commit }, token) { return commit('setAccessToken', token) },
+    setAccessToken({ commit }, token) { return commit('setAccessToken', token )},
+
+    toggleRoleIsEditor({ commit }) { return commit('toggleRoleIsEditor') },
 
     /* DATA LOADING */
 
@@ -168,7 +171,9 @@ export default new Vuex.Store({
 
   mutations: {
 
-    setAccessToken: (state, token) => state.acccessToken = token,
+    setAccessToken: (state, token) => state.accessToken = token,
+
+    toggleRoleIsEditor: (state) => state.roleIsEditor = !state.roleIsEditor,
 
     deleteNode(state, { data, getters }) {
 
