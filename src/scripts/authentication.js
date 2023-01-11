@@ -1,4 +1,5 @@
 import store from '../store/index'
+import { loadAllResources } from './aettbok'
 
 // Firebase configuration
 
@@ -12,12 +13,12 @@ firebase.initializeApp(firebaseConfig)
 
 firebaseAuth.getAuth().onAuthStateChanged(user => {
 
-    if (user) { return  console.debug('authentication:stateChange:existingUser', user.email) }
-    return console.debug('authentication:stateChange:user does not exist')
+    if (user) { return console.debug('authentication:stateChange:existingUser', user.email) }
+    return console.debug('authentication:stateChange:unknownUser')
 
 })
 
-// if access token changes, persist it in firebaseUserToken
+// if access token changes, dispatch to store
 
 firebaseAuth.getAuth().onIdTokenChanged(token => {
 
@@ -25,10 +26,14 @@ firebaseAuth.getAuth().onIdTokenChanged(token => {
 
     token.getIdTokenResult()
     .then(result => {
-        console.debug('authentication:tokenChange:received new token:expirationTime', result.expirationTime)
+        console.debug('authentication:tokenChange:receivedNewToken:expirationTime', result.expirationTime)
         store.dispatch('setAccessToken', result)
+        loadAllResources()
     })
-    .catch(error => console.error('authentication:tokenChange', error))
+    .catch(error => {
+        console.error('authentication:tokenChange', error)
+        store.dispatch('setAccessToken', null)
+    })
 
 })
 
@@ -37,14 +42,18 @@ firebaseAuth.getAuth().onIdTokenChanged(token => {
 export function createAccountWithEmailAndPassword(email, password) {
     return new Promise((resolve, reject) => {
 
-        console.debug('authentication:createAccount', email)
-
         let auth = firebaseAuth.getAuth()
 
         return firebaseAuth.createUserWithEmailAndPassword(auth, email, password)
-        .then(credential => resolve(credential))
-        .catch(error => reject(error))
-    
+        .then(() => {
+            console.debug('authentication:createUserWithEmailAndPassword:success')
+            return resolve()
+        })
+        .catch(error => {
+            console.error('authentication:createUserWithEmailAndPassword:error', error)
+            return reject()
+        })
+
     })
 }
 
@@ -52,8 +61,6 @@ export function createAccountWithEmailAndPassword(email, password) {
 
 export function login(username, password) {
     return new Promise((resolve, reject) => {
-
-        console.debug('authentication:login')
 
         let auth = firebaseAuth.getAuth()
 
@@ -63,11 +70,20 @@ export function login(username, password) {
         .then(() => {
 
             firebaseAuth.signInWithEmailAndPassword(auth, username, password)
-            .then(() => resolve(console.debug('authentication:success', username)))
-            .catch(error => reject(error))
+            .then(() => {
+                console.debug('authentication:signInWithEmailAndPassword:success', username)
+                return resolve()
+            })
+            .catch(error => {
+                console.error('authentication:signInWithEmailAndPassword:error', username, error)
+                return reject()
+            })
 
         })
-        .catch(error => reject(error))
+        .catch(error => {
+            console.error('authentication:signInWithEmailAndPassword:setPersistence:error', error)
+            return reject()
+        })
 
     })
 }
@@ -87,27 +103,41 @@ export function loginWithGoogle() {
         .then(() => {
 
             firebaseAuth.signInWithPopup(auth, googleProvider)
-            .then(() => resolve(console.debug('authentication:success:GoogleAccount')))
-            .catch(error => reject(error))
+            .then(() => {
+                console.debug('authentication:signInWithGoogle:success')
+                return resolve()
+            })
+            .catch(error => {
+                console.error('authentication:signInWithGoogle:error', error)
+                return reject()
+            })
 
         })
-        .catch(error => reject(error))
+        .catch(error => {
+            console.error('authentication:signInWithGoogle:setPersistence:error', error)
+            return reject()
+        })
 
     })
 }
 
-// logout from authentication session
+// logout and delete access token in the store
 
 export function logout() {
     return new Promise((resolve, reject) => {
 
-        console.debug('authentication:logout')
-
         let auth = firebaseAuth.getAuth()
 
         firebaseAuth.signOut(auth)
-        .then(() => resolve(console.debug('authentication:logout:success')))
-        .catch(error => reject(error))
+        .then(() => {
+            console.debug('authentication:logout:success')
+            return resolve()
+        })
+        .catch(error => {
+            console.error('authentication:logout:error', error)
+            return reject()
+        })
+        .finally(() => store.dispatch('setAccessToken', null))
 
     })
 }

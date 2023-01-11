@@ -1,14 +1,12 @@
 <template>
-  <v-container>
-    <v-row v-if="showDetails">
-      <v-col cols="12"><location-details /></v-col>
-      <v-col cols="12"><location-sources-documents /></v-col>
-      <v-col cols="12"><events :locationFilter="getLocationPartIds" /></v-col>
-    </v-row>
-    <v-row v-else>
-      <v-col cols="12"><location-list /></v-col>
-    </v-row>
-  </v-container>
+  <div v-if="showDetails">
+    <location-details />
+    <location-sources-documents />
+    <events :locationFilter="getLocationPartIds" />
+  </div>
+  <div v-else>
+    <location-list />
+  </div>
 </template>
 
 <script>

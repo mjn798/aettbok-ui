@@ -7,6 +7,8 @@ import * as data from './aettbokdata'
 
 /* GENERIC FUNCTION */
 
+
+
 // compare two values
 
 export function compareStrings(a, b) { return (a || '').toLocaleLowerCase().localeCompare((b || '').toLocaleLowerCase()) }
@@ -26,13 +28,29 @@ export function toggleArrayValue(value, array) {
 
 
 
-// refresh data from API
+// load all resources
 
-function refreshData() { return store.dispatch('refreshData') }
+export function loadAllResources() {
+
+    store.dispatch('refreshData')
+
+    console.debug('aettbok:loadAllResources')
+
+    loadResource('Document')
+    loadResource('Event')
+    loadResource('Location')
+    loadResource('LocationType')
+    loadResource('Person')
+    loadResource('Source')
+    loadResource('Tag')
+
+}
 
 // process resource and relationships
 
 export function processResource(label) {
+
+    console.debug('aettbok:processResource', label)
 
     switch(label) {
 
@@ -100,6 +118,12 @@ export function deleteNodeWithLabelAndId(label, id) {
 
 // upsert a node for given label
 
+// BIG TODO:
+// this needs to be changed, so that not everything is reloaded
+// instead change only the affected node (insert or update)
+// this also affects all the relations - they need to be flipped in other nodes
+// then re-process everything
+
 export function upsertNode(node, label) {
     return new Promise((resolve, reject) => {
 
@@ -111,7 +135,7 @@ export function upsertNode(node, label) {
 
         return axios
         .post(url, node, { "headers": headers })
-        .then(() => resolve(refreshData()))
+        .then(() => resolve(loadAllResources()))
         .catch(error => reject(error))
 
     })

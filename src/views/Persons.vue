@@ -1,14 +1,12 @@
 <template>
-  <v-container>
-    <v-row v-if="showDetails">
-      <v-col cols="12"><person-details/></v-col>
-      <v-col cols="12" lg="6"><person-events/></v-col>
-      <v-col cols="12" lg="6"><person-family/></v-col>
-    </v-row>
-    <v-row v-else>
-      <v-col cols="12"><person-list/></v-col>
-    </v-row>
-  </v-container>
+  <div v-if="showDetails">
+    <person-details />
+    <person-events />
+    <person-family />
+  </div>
+  <div v-else>
+    <person-list/>
+  </div>
 </template>
 
 <script>

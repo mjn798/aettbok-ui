@@ -1,18 +1,18 @@
 <template>
-  <v-card flat>
-    <v-card-text>
-      <v-progress-linear
-        :buffer-value="getLoadedPercentage"
-        :value="getProcessedPercentage"
-        stream
-      />
-    </v-card-text>
-  </v-card>
+  <v-progress-linear
+    :buffer-value="getLoadedPercentage"
+    :value="getProcessedPercentage"
+    class="mt-2"
+    height="6"
+    stream
+    v-if="getAccessToken !== null && getProcessedPercentage !== 100"
+  />
+  <div class="mt-2" style="height:6px" v-else />
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { loadResource, processResource } from '../scripts/aettbok'
+import { processResource } from '../scripts/aettbok'
 
 export default {
 
@@ -21,26 +21,13 @@ export default {
   computed: {
 
     ...mapGetters({
+      getAccessToken: 'getAccessToken',
       getLoadingStatus: 'getLoadingStatus',
       getProcessingStatus: 'getProcessingStatus',
     }),
 
     getLoadedPercentage() { return Math.round(this.getLoadingStatus.loaded / this.getLoadingStatus.total * 100) },
     getProcessedPercentage() { return Math.round(this.getProcessingStatus.loaded / this.getProcessingStatus.total * 100) },
-
-  },
-
-  mounted() {
-
-    console.debug('Dataloader:start loading')
-
-    loadResource('Document')
-    loadResource('Event')
-    loadResource('Location')
-    loadResource('LocationType')
-    loadResource('Person')
-    loadResource('Source')
-    loadResource('Tag')
 
   },
 
@@ -53,8 +40,6 @@ export default {
 
         if (value === 100) {
 
-          console.debug('Dataloader:start processing')
-
           processResource('Document')
           processResource('Event')
           processResource('Location')
@@ -66,6 +51,7 @@ export default {
         }
 
       },
+      deep: true,
       immediate: true,
     },
 

@@ -1,41 +1,39 @@
 <template>
-  <v-container><v-row><v-col>
+  <v-card>
     <document-editor :id="editingItemId" @close="upsertItem(undefined)" />
-    <v-card>
-      <card-title
-        :filterIconState="filterState"
-        @click="upsertItem(null)"
-        @filter="toggleFilter"
-        titletype="document"
+    <card-title
+      :filterIconState="filterState"
+      @click="upsertItem(null)"
+      @filter="toggleFilter"
+      titletype="document"
+    />
+    <v-card-text>
+      <v-expand-transition>
+        <v-card v-if="filterState">
+          <v-card-title>
+            <v-text-field
+              class="ma-2"
+              clearable
+              dense
+              hide-details
+              label="Search"
+              outlined
+              prepend-inner-icon="mdi-magnify"
+              v-model="filterHasText"
+            />
+          </v-card-title>
+          <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
+        </v-card>
+      </v-expand-transition>
+    </v-card-text>
+    <v-card-text>
+      <data-table
+        :headers="tableHeaders"
+        :items="getFilteredItems"
+        @edit="upsertItem"
       />
-      <v-card-text>
-        <v-expand-transition>
-          <v-card v-if="filterState">
-            <v-card-title>
-              <v-text-field
-                class="ma-2"
-                clearable
-                dense
-                hide-details
-                label="Search"
-                outlined
-                prepend-inner-icon="mdi-magnify"
-                v-model="filterHasText"
-              />
-            </v-card-title>
-            <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
-          </v-card>
-        </v-expand-transition>
-      </v-card-text>
-      <v-card-text>
-        <data-table
-          :headers="tableHeaders"
-          :items="getFilteredItems"
-          @edit="upsertItem"
-        />
-      </v-card-text>
-    </v-card>
-  </v-col></v-row></v-container>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

@@ -1,17 +1,22 @@
 <template>
-    <v-tabs>
-        <v-tab
-          :disabled="!isDataLoaded"
-          :key="item.text"
-          :to="item.route"
-          v-for="item in menuitems"
-        >
-          {{ item.text }}
-        </v-tab>
-        <v-spacer/>
-        <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" />
-        <tooltip-button @click="logout" class="ma-2" buttontype="logout" />
-    </v-tabs>
+  <v-tabs>
+    <v-tab
+      :disabled="!getMenuItemVisibility"
+      :key="item.text"
+      :to="item.route"
+      v-for="item in getMenuItems"
+    >
+      {{ item.text }}
+    </v-tab>
+    <v-spacer />
+    <div v-if="this.getAccessToken !== null">
+      <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" />
+      <tooltip-button @click="logout" class="ma-2" buttontype="logout" />
+    </div>
+    <div v-else>
+      <tooltip-button class="ma-2" buttontype="login" to="/login" />
+    </div>
+  </v-tabs>
 </template>
 
 <script>
@@ -30,15 +35,15 @@ export default {
 
   data: () => ({
 
-    menuitems: [
-      { text: 'Ættbok',    route: '/' },
-      { text: 'Charts',    route: '/charts' },
-      { text: 'Documents', route: '/documents' },
-      { text: 'Events',    route: '/events' },
-      { text: 'Locations', route: '/locations' },
-      { text: 'Persons',   route: '/persons' },
-      { text: 'Sources',   route: '/sources' },
-      { text: 'Tags',      route: '/tags' },
+    menuItems: [
+      { requiresLogin: false, text: 'Ættbok',    route: '/' },
+      { requiresLogin: false, text: 'Charts',    route: '/charts' },
+      { requiresLogin: true,  text: 'Documents', route: '/documents' },
+      { requiresLogin: true,  text: 'Events',    route: '/events' },
+      { requiresLogin: true,  text: 'Locations', route: '/locations' },
+      { requiresLogin: true,  text: 'Persons',   route: '/persons' },
+      { requiresLogin: true,  text: 'Sources',   route: '/sources' },
+      { requiresLogin: true,  text: 'Tags',      route: '/tags' },
     ],
 
   }),
@@ -54,6 +59,8 @@ export default {
 
     getEditMode() { return this.getRoleIsEditor ? 'edit-mode-on' : 'edit-mode-off' },
 
+    getMenuItems() { return this.menuItems.filter(e => this.getMenuItemVisibility(e))},
+
   },
 
   methods: {
@@ -63,16 +70,16 @@ export default {
       toggleRoleIsEditor: 'toggleRoleIsEditor',
     }),
 
-    toggleEditor() {
-      console.log(this.getAccessToken)
-      return this.toggleRoleIsEditor()
-    },
+    getMenuItemVisibility(item) { return !item.requiresLogin || (this.getAccessToken !== null) },
+
+    toggleEditor() { return this.toggleRoleIsEditor() },
 
     logout() {
 
       return authentication.logout()
-      .then(() => this.setAccessToken(null))
-      .catch(() => console.error('authentication:logout:error', error))
+      .finally(() => {
+        if (this.$route.path !== '/') { return this.$router.push('/') }
+      })
 
     },
 

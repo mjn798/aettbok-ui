@@ -71,6 +71,7 @@ icons.set('locations-exact', { icon: 'mdi-map-marker', class: null, color: null 
 icons.set('locations-radius', { icon: 'mdi-map-marker-radius', class: null, color: null })
 icons.set('locationtype-new', { icon: 'mdi-home-plus', class: null, color: null })
 icons.set('locationtypes-edit', { icon: 'mdi-home-edit', class: null, color: null })
+icons.set('login', { icon: 'mdi-login', class: null, color: null })
 icons.set('logout', { icon: 'mdi-logout', class: null, color: null })
 icons.set('marriage', { icon: 'mdi-set-none', class: null, color: null })
 icons.set('person-edit', { icon: 'mdi-account-edit', class: null, color: null })

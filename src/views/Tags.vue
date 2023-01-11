@@ -1,57 +1,55 @@
 <template>
-  <v-container><v-row><v-col>
-    <v-card>
-      <tag-editor :id="editingItemId" @close="upsertItem(undefined)" />
-      <card-title
-        :filterIconState="filterState"
-        @click="upsertItem(null)"
-        @filter="toggleFilter"
-        titletype="tag"
+  <v-card>
+    <tag-editor :id="editingItemId" @close="upsertItem(undefined)" />
+    <card-title
+      :filterIconState="filterState"
+      @click="upsertItem(null)"
+      @filter="toggleFilter"
+      titletype="tag"
+    />
+    <v-card-text>
+      <v-expand-transition>
+        <v-card v-if="filterState">
+          <v-card-title>
+            <tooltip-button
+              :buttontype="`${isTypeSelected(type) ? 'showing' : 'hiding'}-${type}`"
+              :key="type"
+              @click="toggleFilterType(type)"
+              v-for="type in filterTypesAllowed"
+            />
+            <v-spacer/>
+            <v-text-field
+                class="ma-2"
+                clearable
+                dense
+                hide-details
+                label="Search"
+                outlined
+                prepend-inner-icon="mdi-magnify"
+                v-model="filterHasName"
+            />
+          </v-card-title>
+          <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
+        </v-card>
+      </v-expand-transition>
+    </v-card-text>
+    <v-card-text v-if="getTags.length">
+      <tag-chips
+        :allowEdit="true"
+        :allowToggle="true"
+        :selected="selectedTags"
+        :showSelectedOnly="false"
+        @close="upsertItem"
+        @click="toggleTag"
       />
-      <v-card-text>
-        <v-expand-transition>
-          <v-card v-if="filterState">
-            <v-card-title>
-              <tooltip-button
-                :buttontype="`${isTypeSelected(type) ? 'showing' : 'hiding'}-${type}`"
-                :key="type"
-                @click="toggleFilterType(type)"
-                v-for="type in filterTypesAllowed"
-              />
-              <v-spacer/>
-              <v-text-field
-                  class="ma-2"
-                  clearable
-                  dense
-                  hide-details
-                  label="Search"
-                  outlined
-                  prepend-inner-icon="mdi-magnify"
-                  v-model="filterHasName"
-              />
-            </v-card-title>
-            <v-card-subtitle>{{ filterSubtitleText }}</v-card-subtitle>
-          </v-card>
-        </v-expand-transition>
-      </v-card-text>
-      <v-card-text>
-        <tag-chips
-          :allowEdit="true"
-          :allowToggle="true"
-          :selected="selectedTags"
-          :showSelectedOnly="false"
-          @close="upsertItem"
-          @click="toggleTag"
-        />
-      </v-card-text>
-      <v-card-text>
-        <data-table
-          :headers="tableHeaders"
-          :items="getFilteredItems"
-        />
-      </v-card-text>
-    </v-card>
-  </v-col></v-row></v-container>
+    </v-card-text>
+    <v-card-text>
+      <data-table
+        :headers="tableHeaders"
+        :items="getFilteredItems"
+      />
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -99,13 +97,14 @@ export default {
       getLocations: 'getLocations',
       getPersons: 'getPersons',
       getSources: 'getSources',
+      getTags: 'getTags',
     }),
 
     getTaggedDocuments() {
 
       if (!this.filterTypes.includes('documents')) { return [] }
 
-      return this.getDocuments.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+      return this.getDocuments.filter(e => (e.tags || []).some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: 'document',
         id: e.id,
         tagdetails: (e.datelong || ''),
@@ -119,7 +118,7 @@ export default {
 
       if (!this.filterTypes.includes('events')) { return [] }
 
-      return this.getEvents.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+      return this.getEvents.filter(e => (e.tags || []).some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: 'event',
         id: e.id,
         tagdetails: '',
@@ -133,7 +132,7 @@ export default {
 
       if (!this.filterTypes.includes('locations')) { return [] }
 
-      return this.getLocations.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+      return this.getLocations.filter(e => (e.tags || []).some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: 'location',
         id: e.id,
         tagdetails: (e.partofresolved || ''),
@@ -147,7 +146,7 @@ export default {
 
       if (!this.filterTypes.includes('persons')) { return [] }
 
-      return this.getPersons.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+      return this.getPersons.filter(e => (e.tags || []).some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: `person-${e.gender || 'u'}${e.alive ? 'a' : 'd'}`,
         id: e.id,
         tagdetails: `${(e.datebirthlong || '')} • ${(e.datedeathlong || '')}`.trim(),
@@ -161,7 +160,7 @@ export default {
 
       if (!this.filterTypes.includes('sources')) { return [] }
 
-      return this.getSources.filter(e => e.tags.some(tag => this.selectedTags.includes(tag))).map(e => { return {
+      return this.getSources.filter(e => (e.tags || []).some(tag => this.selectedTags.includes(tag))).map(e => { return {
         icon: 'source',
         id: e.id,
         tagdetails: `${e.containedintext || ''} - ${e.storedintext || ''}`.trim(),

@@ -5,6 +5,8 @@ import { processResource } from '../scripts/aettbok'
 
 Vue.use(Vuex)
 
+const numberOfResources = 7
+
 export default new Vuex.Store({
 
   state: {
@@ -71,11 +73,14 @@ export default new Vuex.Store({
 
     /* LOADING STATUS */
 
-    getLoadingStatus: (state) => { return { total: 7, loaded: state.loadedDocuments + state.loadedEvents + state.loadedLocations + state.loadedLocationTypes + state.loadedPersons + state.loadedSources + state.loadedTags }},
-    getProcessingStatus: (state) => { return { total: 7, loaded: state.processedDocuments + state.processedEvents + state.processedLocations + state.processedLocationTypes + state.processedPersons + state.processedSources + state.processedTags }},
+    getNumberLoaded: (state) => state.getAccessToken === null ? numberOfResources : state.loadedDocuments + state.loadedEvents + state.loadedLocations + state.loadedLocationTypes + state.loadedPersons + state.loadedSources + state.loadedTags,
+    getNumberProcessed: (state) => state.getAccessToken === null ? numberOfResources : state.processedDocuments + state.processedEvents + state.processedLocations + state.processedLocationTypes + state.processedPersons + state.processedSources + state.processedTags,
 
-    isDataLoaded: (state) => (state.loadedDocuments + state.loadedEvents + state.loadedLocations + state.loadedLocationTypes + state.loadedPersons + state.loadedSources + state.loadedTags) / 7 === 1,
-    isDataProcessed: (state) => (state.processedDocuments + state.processedEvents + state.processedLocations + state.processedLocationTypes + state.processedPersons + state.processedSources + state.processedTags) / 7 === 1,
+    getLoadingStatus: (_state, getters) => { return { total: numberOfResources, loaded: getters.getNumberLoaded }},
+    getProcessingStatus: (_state, getters) => { return { total: numberOfResources, loaded: getters.getNumberProcessed }},
+
+    isDataLoaded: (_state, getters) => getters.getNumberLoaded === numberOfResources,
+    isDataProcessed: (_state, getters) => getters.getNumberProcessed === numberOfResources,
 
     /* NODES */
 
@@ -153,7 +158,7 @@ export default new Vuex.Store({
 
     /* AUTHENTICATION */
 
-    setAccessToken({ commit }, token) { return commit('setAccessToken', token )},
+    setAccessToken({ commit }, token) { return commit('setAccessToken', token) },
 
     toggleRoleIsEditor({ commit }) { return commit('toggleRoleIsEditor') },
 
@@ -194,6 +199,15 @@ export default new Vuex.Store({
       state.persons.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
       state.sources.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
       state.tags.forEach(node =>          node.relations = node.relations.filter(e => e.id !== data.id))
+
+      // reset processed state
+      state.processedDocuments     = false
+      state.processedEvents        = false
+      state.processedLocations     = false
+      state.processedLocationTypes = false
+      state.processedPersons       = false
+      state.processedSources       = false
+      state.processedTags          = false
 
       // process all nodes to remove node from relations
       processResource('Document')
