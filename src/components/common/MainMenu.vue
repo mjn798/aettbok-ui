@@ -9,12 +9,12 @@
       {{ item.text }}
     </v-tab>
     <v-spacer />
-    <div v-if="this.getAccessToken !== null">
+    <v-tab v-if="getAccessToken === null">
+      <tooltip-button class="ma-2" buttontype="login" to="/login" />
+    </v-tab>
+    <div v-else>
       <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" />
       <tooltip-button @click="logout" class="ma-2" buttontype="logout" />
-    </div>
-    <div v-else>
-      <tooltip-button class="ma-2" buttontype="login" to="/login" />
     </div>
   </v-tabs>
 </template>

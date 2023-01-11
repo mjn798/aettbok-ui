@@ -6,7 +6,7 @@
     <v-main>
       <dataloader />
       <v-container><v-row><v-col>
-        <router-view v-if="isDataProcessed" />
+        <router-view v-if="isDataProcessed || getAccessToken === null" />
       </v-col></v-row></v-container>
     </v-main>
   </v-app>
@@ -30,6 +30,7 @@ export default {
   computed: {
 
     ...mapGetters({
+      getAccessToken: 'getAccessToken',
       isDataProcessed: 'isDataProcessed',
     })
 
