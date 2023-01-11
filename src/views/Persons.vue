@@ -1,8 +1,10 @@
 <template>
   <div v-if="showDetails">
-    <person-details />
-    <person-events />
-    <person-family />
+    <v-row>
+      <v-col cols="12"><person-details /></v-col>
+      <v-col cols="12" md="6"><person-events /></v-col>
+      <v-col cols="12" md="6"><person-family /></v-col>
+    </v-row>
   </div>
   <div v-else>
     <person-list/>

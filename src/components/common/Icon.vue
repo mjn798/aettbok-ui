@@ -34,7 +34,7 @@ icons.set('documents-6', { icon: 'mdi-numeric-6-box-multiple', class: null, colo
 icons.set('documents-7', { icon: 'mdi-numeric-7-box-multiple', class: null, color: null })
 icons.set('documents-8', { icon: 'mdi-numeric-8-box-multiple', class: null, color: null })
 icons.set('documents-9', { icon: 'mdi-numeric-9-box-multiple', class: null, color: null })
-icons.set('edit-mode-off', { icon: 'mdi-pencil-off-outline', class: null, color: null })
+icons.set('edit-mode-off', { icon: 'mdi-eye-outline', class: null, color: null })
 icons.set('edit-mode-on', { icon: 'mdi-pencil', class: null, color: null })
 icons.set('edit', { icon: 'mdi-pencil', class: null, color: null })
 icons.set('event-baptism', { icon: 'mdi-tilde', class: null, color: null })

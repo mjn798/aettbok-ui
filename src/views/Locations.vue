@@ -1,8 +1,10 @@
 <template>
   <div v-if="showDetails">
-    <location-details />
-    <location-sources-documents />
-    <events :locationFilter="getLocationPartIds" />
+    <v-row>
+      <v-col cols="12"><location-details /></v-col>
+      <v-col cols="12"><location-sources-documents /></v-col>
+      <v-col cols="12"><events :locationFilter="getLocationPartIds" /></v-col>
+    </v-row>
   </div>
   <div v-else>
     <location-list />
