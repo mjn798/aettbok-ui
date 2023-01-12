@@ -50,8 +50,6 @@ export function loadAllResources() {
 
 export function processResource(label) {
 
-    console.debug('aettbok:processResource', label)
-
     switch(label) {
 
         case 'Document':     return data.processDocuments()
@@ -135,7 +133,13 @@ export function upsertNode(node, label) {
 
         return axios
         .post(url, node, { "headers": headers })
-        .then(() => resolve(loadAllResources()))
+        .then(result => {
+
+            if (result.status !== 200) { return reject(result.status) }
+
+            return resolve(store.dispatch('upsertNode', { label: label, data: result.data }))
+
+        })
         .catch(error => reject(error))
 
     })

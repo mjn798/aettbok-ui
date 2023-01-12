@@ -172,6 +172,8 @@ export default new Vuex.Store({
 
     deleteNode({ commit, getters }, data) { return commit('deleteNode', { data, getters}) },
 
+    upsertNode({ commit, getters }, data) { return commit('upsertNode', { data, getters}) },
+
   },
 
   mutations: {
@@ -192,13 +194,8 @@ export default new Vuex.Store({
       nodes = nodes.splice(index, 1)
 
       // adjust all relations
-      state.documents.forEach(node =>     node.relations = node.relations.filter(e => e.id !== data.id))
-      state.events.forEach(node =>        node.relations = node.relations.filter(e => e.id !== data.id))
-      state.locations.forEach(node =>     node.relations = node.relations.filter(e => e.id !== data.id))
-      state.locationtypes.forEach(node => node.relations = node.relations.filter(e => e.id !== data.id))
-      state.persons.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
-      state.sources.forEach(node =>       node.relations = node.relations.filter(e => e.id !== data.id))
-      state.tags.forEach(node =>          node.relations = node.relations.filter(e => e.id !== data.id))
+      let labels = [state.documents, state.events, state.locations, state.locationtypes, state.persons, state.sources, state.tags]
+      labels.forEach(label => label.forEach(node => node.relations = node.relations.filter(e => e.id !== data.id)))
 
       // reset processed state
       state.processedDocuments     = false
@@ -220,6 +217,59 @@ export default new Vuex.Store({
 
       // everything ok
       console.debug('store:deleteNode:success', `${data.id} deleted for ${data.label}`)
+
+    },
+
+    upsertNode(state, { data, getters }) {
+
+      let nodes = getters.getNodesForLabel(data.label)
+      let index = nodes.findIndex(e => e.id === data.data.id)
+
+      // if not in array, push otherwise add to the corresponding label
+      if (index < 0) { nodes.push({ ...data.data }) }
+      else { Vue.set(nodes, index, { ...data.data }) }
+
+      // remove all references in other labels
+      let labels = [state.documents, state.events, state.locations, state.locationtypes, state.persons, state.sources, state.tags]
+      labels.forEach(label => label.forEach(node => node.relations = node.relations.filter(e => e.id !== data.data.id)))
+
+      // add references to other labels based on the new relations
+      data.data.relations.forEach(relation => {
+
+        // reverse the direction and point to the upserted object
+        let newRelation = { id: data.data.id, label: data.label, direction: (relation.direction === 'to' ? 'from' : 'to') }
+
+        // get the referenced node
+        let relationNode = getters.getNodesForLabel(relation.label).find(relationNode => relationNode.id === relation.id)
+
+        // if the node does not exist, return doing nothing
+        if (!relationNode) { return }
+
+        // push the new relation
+        relationNode.relations.push(newRelation)
+
+      })
+
+      // reset processed state
+      state.processedDocuments     = false
+      state.processedEvents        = false
+      state.processedLocations     = false
+      state.processedLocationTypes = false
+      state.processedPersons       = false
+      state.processedSources       = false
+      state.processedTags          = false
+
+      // process all nodes to remove node from relations
+      processResource('Document')
+      processResource('Event')
+      processResource('Location')
+      processResource('LocationType')
+      processResource('Person')
+      processResource('Source')
+      processResource('Tag')
+
+      // everything ok
+      console.debug('store:upsertNode:success', `${data.data.id} upserted for ${data.label}`)
 
     },
 
