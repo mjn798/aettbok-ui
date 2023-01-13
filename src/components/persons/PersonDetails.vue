@@ -15,6 +15,7 @@
               <icon class="mx-1" color="grey lighten-1" icontype="event-death" small /> {{ getDateLocationText('death') }} <location-chip :id="selectedItem.deathlocation" v-if="selectedItem.deathlocation" />
             </div>
         </v-card-text>
+        <v-card-text class="ml-8" style="white-space: pre-line" v-if="selectedItem.notes">{{ selectedItem.notes }}</v-card-text>
         <v-card-text v-if="selectedItem.tags.length"><tag-chips :selected="selectedItem.tags" /></v-card-text>
         <v-card-text v-if="selectedItem.documentedby.length"><document-viewer-list :listofids="selectedItem.documentedby" /></v-card-text>
     </v-card>
