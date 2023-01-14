@@ -5,10 +5,7 @@
             :headers="getTableHeaders"
             :items="items"
         >
-            <template v-slot:[`item.actions`]="{item}">
-                <tooltip-button @click="edit(item.id)" buttontype="edit" small v-if="getRoleIsEditor" />
-                <tooltip-button @click="edit(item.id)" buttontype="view" small v-else />
-            </template>
+            <template v-slot:[`item.age`]="{item}">{{ `${ item.age ? item.age.toFixed(0) : '' }` }}</template>
             <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
             <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
             <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>
@@ -21,6 +18,10 @@
             <template v-slot:[`item.storedintext`]="{item}"><location-chip :id="item.storedin" v-if="item.storedin" /></template>
             <template v-slot:[`item.tagtype`]="{item}"><icon :icontype="item.icon" /></template>
             <template v-slot:[`item.wasintext`]="{item}"><location-chip :id="item.wasin" v-if="item.wasin" /></template>
+            <template v-slot:[`item.actions`]="{item}">
+                <tooltip-button @click="edit(item.id)" buttontype="edit" small v-if="getRoleIsEditor" />
+                <tooltip-button @click="edit(item.id)" buttontype="view" small v-else />
+            </template>
             <template v-slot:[`item.actionsview`]="{item}">
                 <tooltip-button @click="edit(item.id)" buttontype="edit" small v-if="getRoleIsEditor" />
                 <tooltip-button @click="edit(item.id)" buttontype="view" small v-else />
@@ -92,6 +93,7 @@ export default {
             { value: 'source', text: 'Source', sortable: true },
             { value: 'lastname', text: 'Last Name', sortable: true },
             { value: 'firstname', text: 'First Name', sortable: true },
+            { value: 'age', text: 'Age', sortable: true },
             { value: 'datebirth', text: 'Birth', sortable: true },
             { value: 'birthlocationtext', text: 'Birth', sortable: true },
             { value: 'datedeath', text: 'Death', sortable: true },

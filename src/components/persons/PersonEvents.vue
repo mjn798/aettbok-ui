@@ -11,8 +11,9 @@
         >
             <v-card>
                 <v-list-item>
-                    <v-list-item-icon>
-                        <icon :icontype="`event-${(event.type || '').toLocaleLowerCase()}`" class="ma-2" />
+                    <v-list-item-icon class="d-flex flex-column align-center">
+                        <div><icon :icontype="`event-${(event.type || '').toLocaleLowerCase()}`" class="ma-2" /></div>
+                        <div class="grey--text" v-if="getAgeText">{{ getAgeText(event) }}</div>
                     </v-list-item-icon>
                     <v-list-item-content>
                         <v-list-item-subtitle class="ma-2" v-if="event.date || event.wasin">
@@ -102,6 +103,14 @@ export default {
 
         getOtherAttendees(event) { return (event.attended || null).filter(e => e !== this.selectedPerson.id) },
         getDateLocationText(event) { return `${event.datelong || ''}${event.wasin ? ' in ' : ''}`.trim() },
+
+        getAgeText(event) {
+
+            if (event.type === 'BIRTH' || !(this.selectedPerson.datebirthnumeric && event.datenumeric)) { return null }
+
+            return (event.datenumeric - this.selectedPerson.datebirthnumeric).toFixed(0)
+
+        }
 
     },
 

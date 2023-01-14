@@ -103,6 +103,7 @@ function getAllDates(day, month, year, item, type = null) {
     item[`date${type || ''}`] = getSortableDate(day, month, year)
     item[`date${type || ''}short`] = getFormattedDate(day, month, year)
     item[`date${type || ''}long`] = getFormattedDate(day, month, year, 'long')
+    item[`date${type || ''}numeric`] = getNumericDate(day, month, year)
 
     return item
 
@@ -131,6 +132,24 @@ export function getFormattedDate(day, month, year, monthLength = 'short') {
     }
 
     return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(undefined, options)
+
+}
+
+// get numeric (decimal) version of the date
+
+function getNumericDate(day, month, year) {
+
+    if (!year) { return NaN }
+    if (!month) { return year }
+
+    // from 2020-01-01 00:00 UTC to actual month and day
+    let epoch2020 = 1577836800000
+    let tempDate = new Date(2020, (month - 1), (day || 1))
+    // convert from milliseconds to days
+    let tempDays = (tempDate.getTime() - epoch2020) / 86400000
+
+    // 366 days per leap year + 1 day to not get to +1 for December 31st
+    return year + (tempDays / 367)
 
 }
 
@@ -338,7 +357,21 @@ export function processPersons() {
                 return
 
             }
+
         })
+
+        if (person.datebirthnumeric && (person.datedeathnumeric || person.alive)) {
+
+            if (person.datedeathnumeric) { return person.age = person.datedeathnumeric - person.datebirthnumeric }
+
+            let tempdate = new Date()
+            let datenumeric = getNumericDate(tempdate.getDate(), tempdate.getMonth() + 1, tempdate.getFullYear())
+
+            if (datenumeric) { return person.age = datenumeric - person.datebirthnumeric }
+
+            return person.age = NaN
+
+        }
 
     })
 

@@ -70,7 +70,7 @@ export default {
     filterIsGender: -1,
     filterIsMarried: -1,
 
-    tableHeaders: ['documentscount', 'personicons', 'lastname', 'firstname', 'datebirth', 'birthlocationtext', 'datedeath', 'deathlocationtext', 'actionsview'],
+    tableHeaders: ['documentscount', 'personicons', 'lastname', 'firstname', 'age', 'datebirth', 'birthlocationtext', 'datedeath', 'deathlocationtext', 'actionsview'],
 
   }),
 
