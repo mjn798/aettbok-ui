@@ -12,8 +12,8 @@
     <v-tab v-if="getAccessToken === null">
       <tooltip-button class="ma-2" buttontype="login" to="/login" />
     </v-tab>
-    <div v-else>
-      <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" />
+    <div class="d-flex align-center" v-else>
+      <tooltip-button @click="toggleEditor" class="ma-2" :buttontype="getEditMode" v-if="isShowingEditButton" />
       <tooltip-button @click="logout" class="ma-2" buttontype="logout" />
     </div>
   </v-tabs>
@@ -60,6 +60,16 @@ export default {
     getEditMode() { return this.getRoleIsEditor ? 'edit-mode-on' : 'edit-mode-off' },
 
     getMenuItems() { return this.menuItems.filter(e => this.getMenuItemVisibility(e))},
+
+    isShowingEditButton() {
+
+      if (this.$route.path === '/') { return false }
+
+      let item = this.menuItems.find(e => this.$route.path.startsWith(e.route) && e.route !== '/')
+
+      return item ? item.requiresLogin : false
+
+    }
 
   },
 
