@@ -2,6 +2,7 @@ const axios = require('axios')
 
 import store from '../store/index'
 import * as data from './aettbokdata'
+import { getAuthToken } from './authentication'
 
 
 
@@ -76,18 +77,26 @@ export function processResource(label) {
 
 export function loadResource(label) {
 
-    const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
+    getAuthToken()
+    .then(token => {
 
-    return axios
-    .get(`${process.env.VUE_APP_API_BASE_URL}/${label}`, { "headers": headers })
-    .then(result => {
+        if (!(token && token.token)) { return console.error(`aettbok:loadResource:token issue`) }
 
-        console.debug(`aettbok:loadResource`, label, result.data)
+        const headers = { 'Authorization': `Bearer ${token.token}` }
 
-        return store.dispatch('setDataForLabel', { label: label, data: result.data, loaded: true })
-
+        return axios
+        .get(`${process.env.VUE_APP_API_BASE_URL}/${label}`, { "headers": headers })
+        .then(result => {
+    
+            console.debug(`aettbok:loadResource`, label, result.data)
+    
+            return store.dispatch('setDataForLabel', { label: label, data: result.data, loaded: true })
+    
+        })
+        .catch(() => console.error(`aettbok:loadResource:Error during loading "${label}"`))
+    
     })
-    .catch(() => console.error(`aettbok:loadResource:Error during loading "${label}"`))
+    .catch(() => console.error(`aettbok:loadResource:unable to get token`))
 
 }
 
@@ -96,51 +105,61 @@ export function loadResource(label) {
 export function deleteNodeWithLabelAndId(label, id) {
     return new Promise((resolve, reject) => {
 
-        const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
+        getAuthToken()
+        .then(token => {
 
-        let url = `${process.env.VUE_APP_API_BASE_URL}/${label}/${id}`
+            if (!(token && token.token)) { return reject(`aettbok:loadResource:token issue`) }
 
-        axios
-        .delete(url, { "headers": headers })
-        .then(result => {
+            const headers = { 'Authorization': `Bearer ${token.token}` }
 
-            if (result.status !== 204) { return reject(result.status) }
+            let url = `${process.env.VUE_APP_API_BASE_URL}/${label}/${id}`
 
-            return resolve(store.dispatch('deleteNode', { label: label, id: id }))
+            axios
+            .delete(url, { "headers": headers })
+            .then(result => {
+
+                if (result.status !== 204) { return reject(result.status) }
+
+                return resolve(store.dispatch('deleteNode', { label: label, id: id }))
+
+            })
+            .catch(error => reject(error))
 
         })
-        .catch(error => reject(error))
+        .catch(() => reject(`aettbok:deleteNodeWithLabelAndId:unable to get token`))
 
     })
 }
 
 // upsert a node for given label
 
-// BIG TODO:
-// this needs to be changed, so that not everything is reloaded
-// instead change only the affected node (insert or update)
-// this also affects all the relations - they need to be flipped in other nodes
-// then re-process everything
-
 export function upsertNode(node, label) {
     return new Promise((resolve, reject) => {
 
-        const headers = { 'Authorization': `Bearer ${store.getters.getAccessToken}` }
+        getAuthToken()
+        .then(token => {
 
-        let url = `${process.env.VUE_APP_API_BASE_URL}/${label}`
+            if (!(token && token.token)) { return reject(`aettbok:loadResource:token issue`) }
 
-        if (node.id) { url += `/${node.id}` }
+            const headers = { 'Authorization': `Bearer ${token.token}` }
 
-        return axios
-        .post(url, node, { "headers": headers })
-        .then(result => {
+            let url = `${process.env.VUE_APP_API_BASE_URL}/${label}`
 
-            if (result.status !== 200) { return reject(result.status) }
+            if (node.id) { url += `/${node.id}` }
 
-            return resolve(store.dispatch('upsertNode', { label: label, data: result.data }))
+            return axios
+            .post(url, node, { "headers": headers })
+            .then(result => {
+
+                if (result.status !== 200) { return reject(result.status) }
+
+                return resolve(store.dispatch('upsertNode', { label: label, data: result.data }))
+
+            })
+            .catch(error => reject(error))
 
         })
-        .catch(error => reject(error))
+        .catch(() => reject(`aettbok:upsertNode:unable to get token`))
 
     })
 }

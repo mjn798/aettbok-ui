@@ -31,11 +31,29 @@ firebaseAuth.getAuth().onIdTokenChanged(token => {
         loadAllResources()
     })
     .catch(error => {
-        console.error('authentication:tokenChange', error)
+        console.error('authentication:tokenChange:error', error)
         store.dispatch('setAccessToken', null)
     })
 
 })
+
+// get the current auth token or a refreshed one
+
+export function getAuthToken() {
+    return new Promise((resolve, reject) => {
+
+        let auth = firebaseAuth.getAuth()
+
+        auth.currentUser.getIdTokenResult()
+        .then(result => resolve(result))
+        .catch(error => {
+            console.error('authentication:getAuthToken:error', error)
+            reject(error)
+        })
+    
+    })
+
+}
 
 // create a new user with username and password
 
