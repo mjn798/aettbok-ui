@@ -5,7 +5,7 @@
             :headers="getTableHeaders"
             :items="items"
         >
-            <template v-slot:[`item.age`]="{item}">{{ `${ item.age ? item.age.toFixed(0) : '' }` }}</template>
+            <template v-slot:[`item.age`]="{item}">{{ `${ item.age ? Math.floor(item.age).toFixed(0) : '' }` }}</template>
             <template v-slot:[`item.birthlocationtext`]="{item}"><location-chip :id="item.birthlocation" v-if="item.birthlocation" /></template>
             <template v-slot:[`item.date`]="{item}">{{ item.datelong }}</template>
             <template v-slot:[`item.datebirth`]="{item}">{{ item.datebirthlong }}</template>

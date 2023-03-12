@@ -120,9 +120,9 @@ export default {
 
         })
 
-        structure.forEach(e => e.children = e.children.sort((a, b) => (a.birth || '').localeCompare(b.birth || '')))
+        structure.forEach(e => e.children = e.children.sort((a, b) => (`${a.datebirthnumeric}` || '').localeCompare(`${b.datebirthnumeric}` || '')))
 
-        return structure.sort((a, b) => (a.partner.birth || '').localeCompare(b.partner.birth || ''))
+        return structure.sort((a, b) => (`${a.partner.datebirthnumeric}` || '').localeCompare(`${b.partner.datebirthnumeric}` || ''))
 
     },
 
@@ -156,8 +156,8 @@ export default {
         })
 
         return {
-            full: Array.from(siblingsFull).filter(e => e.id !== this.selectedPerson.id).sort((a, b) => (a.birth || '').localeCompare(b.birth || '')),
-            half: Array.from(siblingsHalf).filter(e => e.id !== this.selectedPerson.id).sort((a, b) => (a.birth || '').localeCompare(b.birth || '')),
+            full: Array.from(siblingsFull).filter(e => e.id !== this.selectedPerson.id).sort((a, b) => (`${a.datebirthnumeric}` || '').localeCompare(`${b.datebirthnumeric}` || '')),
+            half: Array.from(siblingsHalf).filter(e => e.id !== this.selectedPerson.id).sort((a, b) => (`${a.datebirthnumeric}` || '').localeCompare(`${b.datebirthnumeric}` || '')),
         }
 
     },

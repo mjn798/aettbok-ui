@@ -108,7 +108,7 @@ export default {
 
             if (event.type === 'BIRTH' || !(this.selectedPerson.datebirthnumeric && event.datenumeric)) { return null }
 
-            return (event.datenumeric - this.selectedPerson.datebirthnumeric).toFixed(0)
+            return Math.floor(event.datenumeric - this.selectedPerson.datebirthnumeric).toFixed(0)
 
         }
 
